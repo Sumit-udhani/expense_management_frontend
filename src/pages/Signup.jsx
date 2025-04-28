@@ -1,21 +1,25 @@
 import React, { useState } from 'react'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate,Link} from 'react-router-dom'
 import axios from 'axios'
 import { TextField, Button, Box, Typography } from '@mui/material';
+
 export default function Signup() {
    const [form,setForm] =  useState({name:'',email:'',password:''})
    const [error,setError] = useState('')
    const navigate = useNavigate()
+   const [isLoading, setIsLoading] = useState(false)
    const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prevState) => ({ ...prevState, [name]: value }));
   };
   const handleSubmit = async (e) =>{
     e.preventDefault()
+    setIsLoading(true)
     try {
         
         const response = await axios.post('http://localhost:8085/auth/signup',form)
-        navigate('/verify-email', { state: { email: form.email } });
+        
+        alert('Email sent Successfully')
     } catch (error) {
         setError(err.response?.data?.message || 'An error occurred');
     }
@@ -57,6 +61,7 @@ export default function Signup() {
         <Button type="submit" variant="contained" fullWidth sx={{ marginTop: 2 }}>
           Sign Up
         </Button>
+        <Link to={'/login'}><p>Already have an accont? go to Login</p></Link>
       </form>
     </Box>
   );
