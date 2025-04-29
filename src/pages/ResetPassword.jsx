@@ -1,60 +1,65 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
+import AuthFormWrapper from '../Component/AuthFormWrapper';
+import AuthForm from '../Component/AuthForm';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const ResetPassword = () => {
   const location = useLocation();
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+
   const token = new URLSearchParams(location.search).get('token');
-    const navigate = useNavigate()
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    try {
-      await axios.post(`http://localhost:8085/auth/reset-password?token=${token}`, { newPassword ,confirmPassword});
-      setMessage('Password reset successful');
-      navigate('/login')
-    } catch (err) {
-      setError(err.response?.data?.error || 'An error occurred');
-    }
-  };
+
+  const formik = useFormik({
+    initialValues: {
+      newPassword: '',
+      confirmPassword: '',
+    },
+    validationSchema: Yup.object({
+      newPassword: Yup.string()
+        .min(5, 'Password must be at least 5 characters')
+        .required('New password is required'),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
+        .required('Confirm password is required'),
+    }),
+    onSubmit: async (values, { setSubmitting, setStatus }) => {
+      try {
+        await axios.post(`http://localhost:8085/auth/reset-password?token=${token}`, {
+          newPassword: values.newPassword,
+          confirmPassword: values.confirmPassword,
+        });
+        setMessage('Password reset successful');
+        setStatus({ error: null });
+        navigate('/login');
+      } catch (err) {
+        setStatus({ error: err.response?.data?.message || 'An error occurred' });
+        setMessage('');
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   return (
-    <Box sx={{ maxWidth: 400, margin: 'auto', padding: 2 }}>
+    <AuthFormWrapper>
       <Typography variant="h4" gutterBottom>Reset Password</Typography>
-      {message && <Typography color="success">{message}</Typography>}
-      {error && <Typography color="error">{error}</Typography>}
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="New Password"
-          type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          fullWidth
-          margin="normal"
-          required
-        />
-        <TextField
-          label="Confirm Password"
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          fullWidth
-          margin="normal"
-          required
-        />
-        <Button type="submit" variant="contained" fullWidth sx={{ marginTop: 2 }}>
-          Reset Password
-        </Button>
-      </form>
-    </Box>
+      {message && <Typography color="primary" sx={{ mt: 1 }}>{message}</Typography>}
+      <AuthForm
+        fields={[
+          { name: 'newPassword', label: 'New Password', type: 'password' },
+          { name: 'confirmPassword', label: 'Confirm Password', type: 'password' },
+        ]}
+        formik={formik}
+        buttonLabel="Reset Password"
+        isLoading={formik.isSubmitting}
+        error={formik.status?.error}
+      />
+    </AuthFormWrapper>
   );
 };
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-
+import AuthFormWrapper from '../Component/AuthFormWrapper';
 const VerifyEmail = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,12 +22,15 @@ const VerifyEmail = () => {
   }, [token]);
 
   return (
-    <Box sx={{ textAlign: 'center', marginTop: 5 }}>
-      <Typography variant="h6">{status}</Typography>
-      <Button variant="contained" onClick={() => navigate('/login')} sx={{ marginTop: 2 }}>
+    <AuthFormWrapper backgroundColor="#f9f9fc">
+      <Typography variant="h5" gutterBottom>Email Verification</Typography>
+      <Typography variant="body1" color={status.includes('successfully') ? 'success.main' : 'error'} sx={{ mt: 2 }}>
+        {status}
+      </Typography>
+      <Button variant="contained" onClick={() => navigate('/login')} sx={{ mt: 3 }}>
         Go to Login
       </Button>
-    </Box>
+    </AuthFormWrapper>
   );
 };
 
