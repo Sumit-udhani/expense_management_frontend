@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, TextField, Button, Typography, CircularProgress } from '@mui/material';
 
-export default function AuthForm({
+export default function     AuthForm({
   fields,
   buttonLabel,
   isLoading,
@@ -30,14 +30,31 @@ export default function AuthForm({
           />
         ))}
         <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          sx={{ mt: 2 }}
-          disabled={isLoading}
-        >
-          {isLoading ? <CircularProgress size={24} color="inherit" /> : buttonLabel}
-        </Button>
+        type="submit"
+        variant="contained"
+        fullWidth
+        sx={{ mt: 2, position: 'relative' }}
+      >
+        {isLoading ? (
+          <>
+            <CircularProgress
+              size={24}
+              color="inherit"
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                marginTop: '-12px',
+                marginLeft: '-12px',
+              }}
+            />
+            <span style={{ opacity: 0 }}>{buttonLabel}</span>
+          </>
+        ) : (
+          buttonLabel
+        )}
+      </Button>
+      
         {footer}
       </Box>
     </>

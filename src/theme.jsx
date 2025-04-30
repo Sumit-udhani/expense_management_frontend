@@ -32,17 +32,25 @@ const theme = createTheme({
             borderColor: '#3b82f6',
           },
           '&.Mui-error .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#f44336', 
+            borderColor: '#f44336',
           },
           '&.Mui-error.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#f44336', 
+            borderColor: '#f44336',
           },
           '&.Mui-error:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#f44336', 
+            borderColor: '#f44336',
+          },
+        },
+        input: {
+          '&:-webkit-autofill': {
+            boxShadow: '0 0 0px 1000px #1e293b inset',
+            WebkitTextFillColor: '#F8FAFC',
+            transition: 'background-color 5000s ease-in-out 0s',
           },
         },
       },
     },
+    
     // MuiLink: {
     //   styleOverrides: {
     //     root: {

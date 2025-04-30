@@ -3,6 +3,7 @@ import { Box, Typography, Button } from '@mui/material';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AuthFormWrapper from '../Component/AuthFormWrapper';
+import api from '../api/axiosInterceptor';
 const VerifyEmail = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const VerifyEmail = () => {
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        await axios.get(`http://localhost:8085/auth/verify-email?token=${token}`);
+        await api.get(`/auth/verify-email?token=${token}`)
         setStatus('Email verified successfully!');
       } catch (err) {
         setStatus('Verification failed. Invalid or expired token.');

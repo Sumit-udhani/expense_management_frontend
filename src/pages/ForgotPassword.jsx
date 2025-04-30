@@ -5,6 +5,7 @@ import AuthFormWrapper from '../Component/AuthFormWrapper';
 import AuthForm from '../Component/AuthForm';
 import { useFormik, validateYupSchema } from 'formik';
 import * as Yup from 'yup';
+import api from '../api/axiosInterceptor';
 function ForgotPassword() {
   const [message, setMessage] = useState(''); 
   const formik = useFormik({
@@ -16,7 +17,7 @@ function ForgotPassword() {
     }),
     onSubmit: async (values, { setSubmitting, setStatus }) => {
       try {
-        await axios.post('http://localhost:8085/auth/forgot-password', values);
+        await api.post('/auth/forgot-password',values)
         setMessage('Password reset email sent');
     
       } catch (err) {

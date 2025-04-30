@@ -6,6 +6,7 @@ import AuthFormWrapper from '../Component/AuthFormWrapper';
 import AuthForm from '../Component/AuthForm';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import api from '../api/axiosInterceptor';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -29,13 +30,16 @@ const ResetPassword = () => {
     }),
     onSubmit: async (values, { setSubmitting, setStatus }) => {
       try {
-        await axios.post(`http://localhost:8085/auth/reset-password?token=${token}`, {
+        await api.post(`/auth/reset-password?token=${token}`,{ 
           newPassword: values.newPassword,
           confirmPassword: values.confirmPassword,
         });
         setMessage('Password reset successful');
         setStatus({ error: null });
-        navigate('/login');
+        setTimeout(()=>{
+
+          navigate('/login');
+        },2000)
       } catch (err) {
         setStatus({ error: err.response?.data?.message || 'An error occurred' });
         setMessage('');
@@ -48,7 +52,7 @@ const ResetPassword = () => {
   return (
     <AuthFormWrapper>
       <Typography variant="h4" gutterBottom>Reset Password</Typography>
-      {message && <Typography color="primary" sx={{ mt: 1 }}>{message}</Typography>}
+      {message && <Typography color="#66bb6a" sx={{ mt: 1 }}>{message}</Typography>}
       <AuthForm
         fields={[
           { name: 'newPassword', label: 'New Password', type: 'password' },
