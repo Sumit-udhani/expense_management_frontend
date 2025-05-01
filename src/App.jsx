@@ -8,6 +8,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("role")
     setLoggedIn(false);
   };
 

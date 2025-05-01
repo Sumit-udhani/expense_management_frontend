@@ -22,19 +22,32 @@ const Login = ({setLoggedIn}) => {
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const response = await api.post('/auth/login',values)
+        const response = await api.post('/auth/login', values);
+        const { token, role } = response.data;
+    
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', role);
+    
         setStatus({ success: 'Login Successfully' });
-        localStorage.setItem('token', response.data.token);
-        setLoggedIn(true)
+    
+     
         setTimeout(() => {
-          navigate('/welcome');
-        }, 2000);
+          if (role === 'Admin') {
+            navigate('/admin');
+          } else {
+            navigate('/welcome');
+          }
+    
+         
+          setTimeout(() => setLoggedIn(true), 100);
+        }, 1000);
       } catch (err) {
         setStatus({ error: err.response?.data?.message || 'An error occurred' });
       } finally {
         setSubmitting(false);
       }
-    },
+    }
+    
   });
 
   return (

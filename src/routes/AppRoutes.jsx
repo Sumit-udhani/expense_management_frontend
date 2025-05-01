@@ -5,7 +5,9 @@ import VerifyEmail from "../pages/VerifyEmail";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import Welcome from "../pages/Welcome";
-
+import ProtectedRoute from "../Component/ProtectedRoute";
+import AdminDashboard from "../pages/AdminDashboard";
+import UnAuthorize from "../pages/UnAuthorize";
 const AppRoutes = ({ loggedIn, setLoggedIn,handleLogout }) => (
   <Routes>      
     <Route
@@ -44,6 +46,18 @@ const AppRoutes = ({ loggedIn, setLoggedIn,handleLogout }) => (
       path="/welcome"
       element={loggedIn ? <Welcome  handleLogout={handleLogout}/> : <Navigate to="/login" replace />}
     />
+    <Route
+  path="/admin"
+  element={
+    <ProtectedRoute roleRequired="Admin">
+      <AdminDashboard handleLogout={handleLogout}/>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/unauthorized"
+  element={ <UnAuthorize/>}
+/>
     <Route path="*" element={<div style={{textAlign:'center',fontSize:'30px'}}>Page not found</div>} />
   </Routes>
 );
