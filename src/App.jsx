@@ -6,19 +6,12 @@ import AppRoutes from "./routes/AppRoutes";
 import AppNavigator from "./Component/AppNavigator";
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role")
-    setLoggedIn(false);
-  };
-
   return (
     <BrowserRouter>
       <AppNavigator setLoggedIn={setLoggedIn} />
       <AppRoutes
         loggedIn={loggedIn}
         setLoggedIn={setLoggedIn}
-        handleLogout={handleLogout}
       />
     </BrowserRouter>
   );

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import api from "../api/axiosInterceptor";
 import ReusableTable from "../Component/ReusableTable";
 import AuthButton from "../Component/AuthButton";
-
-const AdminDashboard = ({ handleLogout }) => {
+import useLogout from '../hooks/useLogout'; 
+const AdminDashboard = ({ setLoggedIn }) => {
+  const logout = useLogout(setLoggedIn); 
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ const AdminDashboard = ({ handleLogout }) => {
 
   return (
     <>
-      <AuthButton label="Log Out" onClick={handleLogout} />
+      <AuthButton label="Log Out" onClick={logout} />
       <ReusableTable
         title="All Users"
         columns={["ID", "Name", "Email", "Role", "Status"]}

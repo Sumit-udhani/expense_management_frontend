@@ -1,14 +1,23 @@
-import React from 'react'
-import AuthButton from '../Component/AuthButton'
+import React from 'react';
+import { Typography, Box } from '@mui/material';
 
-function Welcome({handleLogout}) {
+function Welcome() {
   return (
-    <div style={{display:'flex',justifyContent:'center',alignItems: 'center',
-    }}>
-    <h1 style={{textAlign:'center'}}>Welcome on Employee Dashboard</h1>
-    <AuthButton label="Log Out" onClick={handleLogout} />
-    </div>
-  )
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '80vh',
+        color: 'text.primary',
+      }}
+    >
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Welcome on Employee Dashboard
+      </Typography>
+    </Box>
+  );
 }
 
-export default Welcome
+export default Welcome;

@@ -8,17 +8,18 @@ import Welcome from "../pages/Welcome";
 import ProtectedRoute from "../Component/ProtectedRoute";
 import AdminDashboard from "../pages/AdminDashboard";
 import UnAuthorize from "../pages/UnAuthorize";
-const AppRoutes = ({ loggedIn, setLoggedIn,handleLogout }) => (
-  <Routes>      
+import EmployeeLayout from "../Layout/EmployeeLayout";
+import CreateCategory from "../Component/CategoryForm";
+import AddExpense from "../Component/AddExpense";
+const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
+  <Routes>
     <Route
       path="/"
       element={<Navigate to={loggedIn ? "/welcome" : "/signup"} replace />}
     />
     <Route
       path="/signup"
-      element={
-        !loggedIn ? <Signup /> : <Navigate to="/welcome" replace />
-      }
+      element={!loggedIn ? <Signup /> : <Navigate to="/welcome" replace />}
     />
     <Route
       path="/login"
@@ -36,29 +37,62 @@ const AppRoutes = ({ loggedIn, setLoggedIn,handleLogout }) => (
     />
     <Route
       path="/forgot-password"
-      element={!loggedIn ? <ForgotPassword /> : <Navigate to="/welcome" replace />}
+      element={
+        !loggedIn ? <ForgotPassword /> : <Navigate to="/welcome" replace />
+      }
     />
     <Route
       path="/reset-password"
-      element={!loggedIn ? <ResetPassword /> : <Navigate to="/welcome" replace />}
+      element={
+        !loggedIn ? <ResetPassword /> : <Navigate to="/welcome" replace />
+      }
     />
     <Route
       path="/welcome"
-      element={loggedIn ? <Welcome  handleLogout={handleLogout}/> : <Navigate to="/login" replace />}
+      element={
+        loggedIn ? (
+          <EmployeeLayout setLoggedIn={setLoggedIn}>
+          <Welcome  />
+          </EmployeeLayout>
+        ) : (
+          <Navigate to="/login" replace />
+        )
+      }
     />
     <Route
-  path="/admin"
-  element={
-    <ProtectedRoute roleRequired="Admin">
-      <AdminDashboard handleLogout={handleLogout}/>
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/unauthorized"
-  element={ <UnAuthorize/>}
-/>
-    <Route path="*" element={<div style={{textAlign:'center',fontSize:'30px'}}>Page not found</div>} />
+      path="/admin"
+      element={
+        <ProtectedRoute roleRequired="Admin">
+          <AdminDashboard setLoggedIn={setLoggedIn} />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route path="/unauthorized" element={<UnAuthorize />} />
+    <Route
+      path="/create-category"
+      element={
+        <EmployeeLayout setLoggedIn={setLoggedIn}>
+          <CreateCategory />
+        </EmployeeLayout>
+      }
+    />
+    <Route 
+    path="/add-expense"
+    element={
+      <EmployeeLayout setLoggedIn={setLoggedIn}>
+        <AddExpense/>
+      </EmployeeLayout>
+    }
+    />
+    <Route
+      path="*"
+      element={
+        <div style={{ textAlign: "center", fontSize: "30px" }}>
+          Page not found
+        </div>
+      }
+    />
   </Routes>
 );
 
