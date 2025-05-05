@@ -13,31 +13,43 @@ import {
   Toolbar,
 } from '@mui/material';
 import AuthButton from '../Component/AuthButton';
-import useLogout from '../hooks/useLogout'; 
+import useLogout from '../hooks/useLogout';
 
 const drawerWidth = 240;
 
 const EmployeeLayout = ({ children, setLoggedIn }) => {
-  const logout = useLogout(setLoggedIn); 
+  const logout = useLogout(setLoggedIn);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <AppBar
-        position="fixed"
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          backgroundColor: 'background.paper',
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          alignItems:'center'
-        }}
-      >
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h6" color="#F8FAFC" sx={{alignItems:'center'}}>
-            Employee Dashboard
-          </Typography>
-        </Toolbar>
-      </AppBar>
+    <AppBar
+  position="fixed"
+  sx={{
+    zIndex: (theme) => theme.zIndex.drawer + 1,
+    backgroundColor: 'background.paper',
+    borderBottom: '1px solid',
+    borderColor: 'divider',
+  }}
+>
+  <Toolbar sx={{ position: 'relative', minHeight: 64 }}>
+    <Typography
+      variant="h6"
+      color="#F8FAFC"
+      sx={{
+        position: 'absolute',
+        left: '50%',
+        transform: 'translateX(-50%)',
+      }}
+    >
+      Employee Dashboard
+    </Typography>
+
+    <Box sx={{ marginLeft: 'auto' }}>
+      <AuthButton label="Logout" onClick={logout} />
+    </Box>
+  </Toolbar>
+</AppBar>
+
 
       <Drawer
         variant="permanent"
@@ -63,8 +75,7 @@ const EmployeeLayout = ({ children, setLoggedIn }) => {
         <List>
           {[
             { label: 'Dashboard', path: '/welcome' },
-            { label: 'Add Expense', path: '/add-expense' },
-            { label: 'My Expenses', path: '/expenses-list' },
+            { label: 'Expenses', path: '/expenses-list' },
             { label: 'Create Category', path: '/create-category' },
           ].map((item) => (
             <ListItem disablePadding key={item.label}>
@@ -73,10 +84,6 @@ const EmployeeLayout = ({ children, setLoggedIn }) => {
               </ListItemButton>
             </ListItem>
           ))}
-          <Divider sx={{ borderColor: 'divider', my: 1 }} />
-          <ListItem>
-            <AuthButton label="Logout" onClick={logout} />
-          </ListItem>
         </List>
       </Drawer>
 

@@ -11,6 +11,10 @@ import UnAuthorize from "../pages/UnAuthorize";
 import EmployeeLayout from "../Layout/EmployeeLayout";
 import CreateCategory from "../Component/CategoryForm";
 import AddExpense from "../Component/AddExpense";
+import MyExpenses from "../Component/MyExpenses";
+import AdminLayout from "../Layout/AdminLayout";
+import AllUsersExpense from "../Component/AllUsersExpense";
+import WelcomeAdmin from "../pages/WelcomeAdmin";
 const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
   <Routes>
     <Route
@@ -63,7 +67,9 @@ const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
       path="/admin"
       element={
         <ProtectedRoute roleRequired="Admin">
-          <AdminDashboard setLoggedIn={setLoggedIn} />
+        <AdminLayout setLoggedIn={setLoggedIn} >
+        <AdminDashboard setLoggedIn={setLoggedIn} />
+        </AdminLayout>
         </ProtectedRoute>
       }
     />
@@ -83,6 +89,35 @@ const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
       <EmployeeLayout setLoggedIn={setLoggedIn}>
         <AddExpense/>
       </EmployeeLayout>
+    }
+    />
+    <Route
+    path="/expenses-list"
+    element ={
+      <EmployeeLayout setLoggedIn={setLoggedIn}>
+      <MyExpenses/>
+      </EmployeeLayout>
+    }
+    />
+    <Route 
+    path="/admin-expenses-list"
+    element ={
+      <AdminLayout setLoggedIn={setLoggedIn}>
+      <AllUsersExpense/>
+      </AdminLayout>
+    }
+    />
+    <Route
+    path="/welcomeAdmin"
+    element={
+        loggedIn ?(
+          <AdminLayout setLoggedIn={setLoggedIn}>
+          <WelcomeAdmin/>
+          </AdminLayout>
+        ):(
+          <Navigate to="/login" replace />
+        )
+     
     }
     />
     <Route

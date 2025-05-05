@@ -2,17 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import api from '../api/axiosInterceptor';
-import AuthForm from '../Component/AuthForm';
-import AuthFormWrapper from '../Component/AuthFormWrapper';
-import Dropdown from './ReusableDropdown'; // Import Dropdown component
-import { Box, Typography, TextField } from '@mui/material';
+import AuthForm from './AuthForm';
 
-const AddExpense = () => {
+const AddExpenseForm = ({ onSuccess }) => {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -33,8 +29,8 @@ const AddExpense = () => {
       categoryId: '',
       paymentMode: 'Cash',
       paymentStatus: 'Pending',
-      attachment: null, // Attachment is initially null
-      date: '', // Add date field
+      attachment: null,
+      date: '',
     },
     validationSchema: Yup.object({
       title: Yup.string().required('Title is required'),
@@ -42,29 +38,24 @@ const AddExpense = () => {
       categoryId: Yup.string().required('Category is required'),
       paymentMode: Yup.string().required('Payment Mode is required'),
       paymentStatus: Yup.string().required('Payment Status is required'),
-      date: Yup.date().required('Date is required').nullable(), // Validate date
+      date: Yup.date().required('Date is required').nullable(),
     }),
     onSubmit: async (values, { resetForm }) => {
       setIsLoading(true);
       setError('');
       try {
         const formData = new FormData();
-        formData.append('title', values.title);
-        formData.append('amount', values.amount);
-        formData.append('categoryId', values.categoryId);
-        formData.append('paymentMode', values.paymentMode);
-        formData.append('paymentStatus', values.paymentStatus);
-        formData.append('date', values.date); // Append date field
-        if (values.attachment) {
-          formData.append('attachment', values.attachment); // Append the file if exists
-        }
+        Object.entries(values).forEach(([key, value]) => {
+          if (key === 'attachment' && !value) return;
+          formData.append(key, value);
+        });
 
         await api.post('/expense', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
         resetForm();
-        alert('Expense added successfully!');
+        onSuccess(); 
       } catch (err) {
         setError('Failed to add expense');
         console.error(err);
@@ -74,7 +65,6 @@ const AddExpense = () => {
     },
   });
 
-  // Prepare fields for reusable form
   const fields = [
     { name: 'title', label: 'Title' },
     { name: 'amount', label: 'Amount', type: 'number' },
@@ -105,38 +95,19 @@ const AddExpense = () => {
         { value: 'Failed', label: 'Failed' },
       ],
     },
-    {
-      name: 'date',
-      label: 'Date',
-      type: 'date', // Use date input
-    },
-    {
-      name: 'attachment',
-      label: 'Attachment',
-      type: 'file', // File input field for attachment
-    },
+    { name: 'date', type: 'date' },
+    { name: 'attachment', type: 'file' },
   ];
 
   return (
-    <AuthFormWrapper>
-      <Typography variant="h5" gutterBottom>Add Expense</Typography>
-      <Box
-        sx={{
-          maxHeight: '500px', // Set a max height for scrolling
-          overflowY: 'auto', // Allow vertical scrolling if content overflows
-          padding: '20px', // Optional padding
-        }}
-      >
-        <AuthForm
-          formik={formik}
-          fields={fields}
-          buttonLabel="Add Expense"
-          isLoading={isLoading}
-          error={error}
-        />
-      </Box>
-    </AuthFormWrapper>
+    <AuthForm
+      formik={formik}
+      fields={fields}
+      buttonLabel="Add Expense"
+      isLoading={isLoading}
+      error={error}
+    />
   );
 };
 
-export default AddExpense;
+export default AddExpenseForm;

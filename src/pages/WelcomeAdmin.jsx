@@ -1,0 +1,23 @@
+import React from 'react';
+import { Typography, Box } from '@mui/material';
+
+function WelcomeAdmin() {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '80vh',
+        color: 'text.primary',
+      }}
+    >
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Welcome on Admin Dashboard
+      </Typography>
+    </Box>
+  );
+}
+
+export default WelcomeAdmin;

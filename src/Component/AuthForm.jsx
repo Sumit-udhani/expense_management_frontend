@@ -1,4 +1,3 @@
-// src/Component/AuthForm.jsx
 import React from 'react';
 import { Box, TextField, Button, Typography, CircularProgress } from '@mui/material';
 import Dropdown from './ReusableDropdown';
@@ -16,7 +15,6 @@ export default function AuthForm({
       {error && <Typography color="error">{error}</Typography>}
       <Box component="form" onSubmit={formik.handleSubmit} sx={{ width: '100%' }}>
         {fields.map((field) => {
-          // If the field type is 'dropdown', render the Dropdown component
           if (field.type === 'dropdown') {
             return (
               <Dropdown
@@ -31,8 +29,24 @@ export default function AuthForm({
                 touched={formik.touched[field.name]}
               />
             );
+          } else if (field.type === 'file') {
+            return (
+              <TextField
+                key={field.name}
+                type="file"
+                name={field.name}
+                fullWidth
+                margin="normal"
+                InputLabelProps={{ shrink: true }}
+                onChange={(event) =>
+                  formik.setFieldValue(field.name, event.currentTarget.files[0])
+                }
+                onBlur={formik.handleBlur}
+                error={formik.touched[field.name] && Boolean(formik.errors[field.name])}
+                helperText={formik.touched[field.name] && formik.errors[field.name]}
+              />
+            );
           } else {
-            // If the field type is not 'dropdown', render a regular TextField
             return (
               <TextField
                 key={field.name}
@@ -75,7 +89,7 @@ export default function AuthForm({
             buttonLabel
           )}
         </Button>
-      
+
         {footer}
       </Box>
     </>
