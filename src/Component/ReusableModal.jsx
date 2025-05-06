@@ -10,10 +10,10 @@ const ReusableModal = ({ open, handleClose, title, children, maxWidth = 600 }) =
       aria-labelledby="modal-title"
       sx={{
         display: 'flex',
-        alignItems: 'center', // Center vertically
-        justifyContent: 'center', // Center horizontally
+        alignItems: 'center', 
+        justifyContent: 'center', 
         overflow: 'auto',
-        p: 2, // Padding around modal
+        p: 2, 
       }}
     >
       <Box
@@ -25,8 +25,8 @@ const ReusableModal = ({ open, handleClose, title, children, maxWidth = 600 }) =
           maxWidth,
           borderRadius: 2,
           outline: 'none',
-          maxHeight: '90vh', // Prevent overflow off screen
-          overflowY: 'auto', // Scroll if content too long
+          maxHeight: '90vh', 
+          overflowY: 'auto', 
         }}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>

@@ -1,38 +1,57 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Typography, TextField } from "@mui/material";
+import { Box, Button, Typography, TextField,CircularProgress } from "@mui/material";
 import api from "../api/axiosInterceptor";
 import ReusableTable from "../Component/ReusableTable";
-import AuthButton from "../Component/AuthButton";
-
+import TableActionButton from "../Component/TableActionButton";
+import ReusableModal from "../Component/ReusableModal";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
+  const [sortConfig, setSortConfig] = useState({ key: 'Name', direction: 'asc' });
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [loadingUserId, setLoadingUserId] = useState(null); 
+  const [isStatusUpdating, setIsStatusUpdating] = useState(false);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await api.get("/admin/users");
-        setUsers(res.data.users || []);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-      }
-    };
-
     fetchUsers();
   }, []);
 
-  const deleteUser = async (id) => {
+  const fetchUsers = async () => {
     try {
-      const confirm = window.confirm("Are you sure you want to delete?");
-      if (confirm) {
-        await api.delete(`/admin/${id}`);
-        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-      }
-    } catch (error) {
-      console.error("Failed to delete user:", error);
+      const res = await api.get("/admin/users");
+      setUsers(res.data.users || []);
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+    }
+  };
+
+  const handleSort = (column) => {
+    setSortConfig((prev) => ({
+      key: column,
+      direction: prev.key === column && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
+  const toggleUserStatus = async () => {
+    if (!selectedUser) return;
+    setIsStatusUpdating(true);
+    setLoadingUserId(selectedUser.id);
+    try {
+      await api.patch(`/admin/users/${selectedUser.id}/status`, {
+        isActive: !selectedUser.isActive,
+      });
+      fetchUsers();
+    } catch (err) {
+      console.error("Failed to update user status:", err);
+    } finally {
+      setIsStatusUpdating(false);
+      setConfirmModalOpen(false);
+      setSelectedUser(null);
+      setLoadingUserId(null);
     }
   };
 
@@ -40,8 +59,30 @@ const AdminDashboard = () => {
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
-  const paginatedUsers = filteredUsers.slice(
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    const key = sortConfig.key;
+
+    const getValue = (user) => {
+      switch (key) {
+        case 'ID': return user.id;
+        case 'Name': return user.name.toLowerCase();
+        case 'Email': return user.email.toLowerCase();
+        case 'Role': return user.Role?.name?.toLowerCase() || '';
+        case 'Status': return user.isActive ? 'Active' : 'Inactive';
+        default: return '';
+      }
+    };
+
+    const aVal = getValue(a);
+    const bVal = getValue(b);
+
+    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const totalPages = Math.ceil(sortedUsers.length / rowsPerPage);
+  const paginatedUsers = sortedUsers.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
@@ -57,14 +98,14 @@ const AdminDashboard = () => {
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
-            setCurrentPage(1); 
+            setCurrentPage(1);
           }}
         />
       </Box>
 
       <ReusableTable
         title=""
-        columns={["ID", "Name", "Email", "Role", "Status"]}
+        columns={["ID", "Name", "Email", "Role", "Status", "Actions"]}
         rows={paginatedUsers}
         getRowData={(user) => [
           user.id,
@@ -73,13 +114,19 @@ const AdminDashboard = () => {
           user.Role?.name || "N/A",
           user.isActive ? "Active" : "Inactive",
         ]}
-        actions={[
-          {
-            label: "Delete",
-            onClick: (user) => deleteUser(user.id),
-            Component: AuthButton,
-          },
-        ]}
+        onSort={handleSort}
+        sortConfig={sortConfig}
+        actions={(user) => (
+          <TableActionButton
+            label={user.isActive ? "Deactivate" : "Activate"}
+            color={user.isActive ? "error" : "success"}
+            isLoading={loadingUserId === user.id} 
+            onClick={() => {
+              setSelectedUser(user);
+              setConfirmModalOpen(true);
+            }}
+          />
+        )}
       />
 
       <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
@@ -103,6 +150,59 @@ const AdminDashboard = () => {
           Next
         </Button>
       </Box>
+
+      <ReusableModal
+        open={confirmModalOpen}
+        handleClose={() => {
+          setConfirmModalOpen(false);
+          setSelectedUser(null);
+        }}
+        title="Confirm Action"
+      >
+        <Typography mb={2}>
+          Are you sure you want to {selectedUser?.isActive ? "deactivate" : "activate"}{" "}
+          {selectedUser?.name}?
+        </Typography>
+        <Box display="flex" justifyContent="flex-end">
+          <Button
+            onClick={() => {
+              setConfirmModalOpen(false);
+              setSelectedUser(null);
+            }}
+            sx={{ mr: 2 }}
+          >
+            Cancel
+          </Button>
+          <Button
+          variant="contained"
+          color={selectedUser?.isActive ? "error" : "success"}
+          onClick={toggleUserStatus}
+          disabled={isStatusUpdating}
+          sx={{ position: 'relative', minWidth: 100 }}
+        >
+          {isStatusUpdating ? (
+            <>
+              <CircularProgress
+                size={20}
+                color="inherit"
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
+              <span style={{ opacity: 0 }}>
+                {selectedUser?.isActive ? "Deactivate" : "Activate"}
+              </span>
+            </>
+          ) : (
+            selectedUser?.isActive ? "Deactivate" : "Activate"
+          )}
+        </Button>
+        
+        </Box>
+      </ReusableModal>
     </>
   );
 };

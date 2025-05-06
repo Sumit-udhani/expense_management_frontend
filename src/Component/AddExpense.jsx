@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import api from '../api/axiosInterceptor';
 import AuthForm from './AuthForm';
 
-const AddExpenseForm = ({ onSuccess }) => {
+const AddExpenseForm = ({ onSuccess, initialData }) => {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -24,14 +24,15 @@ const AddExpenseForm = ({ onSuccess }) => {
 
   const formik = useFormik({
     initialValues: {
-      title: '',
-      amount: '',
-      categoryId: '',
-      paymentMode: 'Cash',
-      paymentStatus: 'Pending',
+      title: initialData?.title || '',
+      amount: initialData?.amount || '',
+      categoryId: initialData?.categoryId || '',
+      paymentMode: initialData?.paymentMode || 'Cash',
+      paymentStatus: initialData?.paymentStatus || 'Pending',
       attachment: null,
-      date: '',
+      date: initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : '',
     },
+    enableReinitialize: true,
     validationSchema: Yup.object({
       title: Yup.string().required('Title is required'),
       amount: Yup.number().required('Amount is required').positive('Amount must be positive'),
@@ -50,14 +51,22 @@ const AddExpenseForm = ({ onSuccess }) => {
           formData.append(key, value);
         });
 
-        await api.post('/expense', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        if (initialData) {
+         
+          await api.put(`/expense/${initialData.id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        } else {
+         
+          await api.post('/expense', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        }
 
         resetForm();
-        onSuccess(); 
+        onSuccess();
       } catch (err) {
-        setError('Failed to add expense');
+        setError(initialData ? 'Failed to update expense' : 'Failed to add expense');
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -103,7 +112,7 @@ const AddExpenseForm = ({ onSuccess }) => {
     <AuthForm
       formik={formik}
       fields={fields}
-      buttonLabel="Add Expense"
+      buttonLabel={initialData ? 'Edit Expense' : 'Add Expense'}
       isLoading={isLoading}
       error={error}
     />
