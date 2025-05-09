@@ -4,7 +4,7 @@ import Login from "../pages/Login";
 import VerifyEmail from "../pages/VerifyEmail";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
-import Welcome from "../pages/Welcome";
+
 import ProtectedRoute from "../Component/ProtectedRoute";
 import AdminDashboard from "../pages/AdminDashboard";
 import UnAuthorize from "../pages/UnAuthorize";
@@ -15,11 +15,17 @@ import MyExpenses from "../Component/MyExpenses";
 import AdminLayout from "../Layout/AdminLayout";
 import AllUsersExpense from "../Component/AllUsersExpense";
 import WelcomeAdmin from "../pages/WelcomeAdmin";
+import BudgetPage from "../pages/SetBudgetPage";
+import SetBudgetForm from "../Component/setBudgetForm";
+import BudgetStatus from "../pages/BudgetStatus";
+import SetBudgetPage from "../pages/SetBudgetPage";
+import OverallBudgetStatus from "../pages/OverallBudgetStatus";
+import EmployeeDashboard from "../pages/EmployeeDashboard";
 const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
   <Routes>
     <Route
       path="/"
-      element={<Navigate to={loggedIn ? "/welcome" : "/signup"} replace />}
+      element={<Navigate to={!loggedIn && "/signup" } replace />}
     />
     <Route
       path="/signup"
@@ -56,7 +62,7 @@ const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
       element={
         loggedIn ? (
           <EmployeeLayout setLoggedIn={setLoggedIn}>
-          <Welcome  />
+          <EmployeeDashboard/>
           </EmployeeLayout>
         ) : (
           <Navigate to="/login" replace />
@@ -118,6 +124,30 @@ const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
           <Navigate to="/login" replace />
         )
      
+    }
+    />
+    <Route 
+    path="/set-budget"
+    element={
+      <EmployeeLayout setLoggedIn={setLoggedIn}>
+      <SetBudgetPage/>
+      </EmployeeLayout>
+    }
+    />
+    <Route 
+    path="/budget-status-category"
+    element ={
+      <EmployeeLayout  setLoggedIn={setLoggedIn} >
+      <BudgetStatus/>
+      </EmployeeLayout>
+    }
+    />
+    <Route 
+    path="/budget-status"
+    element ={
+      <EmployeeLayout  setLoggedIn={setLoggedIn} >
+     <OverallBudgetStatus/>
+      </EmployeeLayout>
     }
     />
     <Route

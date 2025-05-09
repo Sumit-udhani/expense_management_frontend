@@ -22,7 +22,8 @@ export default function AuthForm({
                 label={field.label}
                 name={field.name}
                 value={formik.values[field.name]}
-                onChange={formik.handleChange}
+                onChange={(value) => formik.setFieldValue(field.name, value)}
+
                 onBlur={formik.handleBlur}
                 options={field.options}
                 error={formik.errors[field.name]}

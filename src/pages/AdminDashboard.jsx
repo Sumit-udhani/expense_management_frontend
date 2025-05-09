@@ -43,7 +43,7 @@ const AdminDashboard = () => {
     try {
       await api.patch(`/admin/users/${selectedUser.id}/status`, {
         isActive: !selectedUser.isActive,
-      });
+      }); 
       fetchUsers();
     } catch (err) {
       console.error("Failed to update user status:", err);
