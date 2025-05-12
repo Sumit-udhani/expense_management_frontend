@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Typography, TextField,CircularProgress } from "@mui/material";
+import { Box, Typography,CircularProgress} from "@mui/material";
 import api from "../api/axiosInterceptor";
 import ReusableTable from "../Component/ReusableTable";
 import TableActionButton from "../Component/TableActionButton";
 import ReusableModal from "../Component/ReusableModal";
-
+import ReusableTextField from "../Component/ReusableTextfield";
+import PaginationButton from "../Component/PaginationButton";
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,7 +16,7 @@ const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [loadingUserId, setLoadingUserId] = useState(null); 
   const [isStatusUpdating, setIsStatusUpdating] = useState(false);
-
+  const [loading,setLoading] = useState(true)
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -26,7 +27,10 @@ const AdminDashboard = () => {
       setUsers(res.data.users || []);
     } catch (err) {
       console.error("Failed to fetch users:", err);
+    }finally{
+      setLoading(false)
     }
+
   };
 
   const handleSort = (column) => {
@@ -86,21 +90,27 @@ const AdminDashboard = () => {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
-
+  if (loading) {
+    return(
+      
+      <Box display="flex" justifyContent="center" mt={4}>
+      <CircularProgress />
+    </Box>
+      ) 
+  }
   return (
     <>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h6">All Users</Typography>
-        <TextField
-          label="Search by Name"
-          variant="outlined"
-          size="small"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
+        <ReusableTextField
+        label="Search by Name"
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1);
+        }}
+      />
+      
       </Box>
 
       <ReusableTable
@@ -130,25 +140,23 @@ const AdminDashboard = () => {
       />
 
       <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
-        <Button
-          variant="outlined"
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          sx={{ mr: 2 }}
-        >
-          Previous
-        </Button>
+      <PaginationButton
+      label="Previous"
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+      sx={{ mr: 2 }}
+    />
         <Typography variant="body2">
           Page {currentPage} of {totalPages || 1}
         </Typography>
-        <Button
-          variant="outlined"
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages || totalPages === 0}
-          sx={{ ml: 2 }}
-        >
-          Next
-        </Button>
+        <PaginationButton
+        label="Next"
+        onClick={() =>
+          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+        }
+        disabled={currentPage === totalPages || totalPages === 0}
+        sx={{ ml: 2 }}
+      />
       </Box>
 
       <ReusableModal
@@ -164,42 +172,22 @@ const AdminDashboard = () => {
           {selectedUser?.name}?
         </Typography>
         <Box display="flex" justifyContent="flex-end">
-          <Button
-            onClick={() => {
-              setConfirmModalOpen(false);
-              setSelectedUser(null);
-            }}
-            sx={{ mr: 2 }}
-          >
-            Cancel
-          </Button>
-          <Button
-          variant="contained"
-          color={selectedUser?.isActive ? "error" : "success"}
-          onClick={toggleUserStatus}
-          disabled={isStatusUpdating}
-          sx={{ position: 'relative', minWidth: 100 }}
-        >
-          {isStatusUpdating ? (
-            <>
-              <CircularProgress
-                size={20}
-                color="inherit"
-                sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                }}
-              />
-              <span style={{ opacity: 0 }}>
-                {selectedUser?.isActive ? "Deactivate" : "Activate"}
-              </span>
-            </>
-          ) : (
-            selectedUser?.isActive ? "Deactivate" : "Activate"
-          )}
-        </Button>
+        <TableActionButton
+        label={"Cancel"}
+        color="primary"
+        onClick={() => {
+         setConfirmModalOpen(false)
+          setSelectedUser(null)
+        }}
+        />
+        <TableActionButton
+        label={selectedUser?.isActive ? "Deactivate" : "Activate"}
+        color={selectedUser?.isActive ? "error" : "success"}
+        onClick={toggleUserStatus}
+        isLoading={isStatusUpdating}
+        sx={{ minWidth: 100 }}
+      />
+      
         
         </Box>
       </ReusableModal>

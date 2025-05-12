@@ -3,25 +3,31 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import api from '../api/axiosInterceptor';
 import AuthForm from './AuthForm';
+import { CircularProgress } from '@mui/material';
 
 const AddExpenseForm = ({ onSuccess, initialData }) => {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const [categoryLoading, setCategoryLoading] = useState(true);
+  const [msg,setMsg] = useState('')
   useEffect(() => {
     const fetchCategories = async () => {
+      setMsg('Categories loading'); 
       try {
         const res = await api.get('/category');
         setCategories(res.data);
       } catch (err) {
         console.error('Error fetching categories:', err);
         setError('Failed to load categories');
+      }finally{
+        setCategoryLoading(false)
       }
     };
     fetchCategories();
   }, []);
 
+  
   const formik = useFormik({
     initialValues: {
       title: initialData?.title || '',
@@ -107,7 +113,14 @@ const AddExpenseForm = ({ onSuccess, initialData }) => {
     { name: 'date', type: 'date' },
     { name: 'attachment', type: 'file' },
   ];
-
+  if (categoryLoading) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+      
+        <CircularProgress />
+      </div>
+    );
+  }
   return (
     <AuthForm
       formik={formik}

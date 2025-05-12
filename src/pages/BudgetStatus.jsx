@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Grid, Paper, Divider } from '@mui/material';
 import api from '../api/axiosInterceptor';
-
+import Dropdown from '../Component/ReusableDropdown';
 const BudgetStatus = () => {
   const [loading, setLoading] = useState(true);
   const [budgets, setBudgets] = useState([]);
   const [error, setError] = useState('');
-
+  const [msg,setMsg] = useState('')
   useEffect(() => {
     const fetchBudgets = async () => {
+      setMsg('Budgets fetching')
       try {
         setLoading(true);
         setError('');
 
         const [budgetRes, expenseRes] = await Promise.all([
-          api.get('/budget/status'),
+          api.get(`/budget/status`),
           api.get('/expense'),
         ]);
 
         const budgetMap = {};
         budgetRes.data.budgets.forEach((budget) => {
-          // Only include category-specific budgets
+         
           if (budget.categoryId !== null) {
             budgetMap[budget.categoryId] = {
               ...budget,
@@ -53,7 +54,7 @@ const BudgetStatus = () => {
     };
 
     fetchBudgets();
-  }, []);
+  },[]);
 
   if (loading) {
     return (
@@ -76,6 +77,7 @@ const BudgetStatus = () => {
       <Typography variant="h6" gutterBottom>
         Category-wise Budgets (This Month)
       </Typography>
+   
       <Divider sx={{ mb: 2 }} />
       <Grid container spacing={2}>
         {budgets.length === 0 ? (

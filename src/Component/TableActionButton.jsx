@@ -4,7 +4,7 @@ import React from 'react';
 const TableActionButton = ({ label, isLoading, onClick, color = 'primary', ...props }) => {
   return (
     <Button
-      variant="contained"
+      variant="outlined"
       size="small"
       color={color}
       onClick={onClick}

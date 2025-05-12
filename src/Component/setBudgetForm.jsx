@@ -4,20 +4,24 @@ import * as Yup from 'yup';
 import api from '../api/axiosInterceptor';
 import AuthForm from './AuthForm';
 import ReusableModal from './ReusableModal';
-
+import { CircularProgress } from '@mui/material';
 const SetBudgetForm = ({ open, handleClose, onSuccess }) => {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const [categoryLoading, setCategoryLoading] = useState(true);
+  const [msg,setMsg] = useState('')
   useEffect(() => {
     const fetchCategories = async () => {
+      setMsg('Categories Loading')
       try {
         const res = await api.get('/category');
         setCategories(res.data);
       } catch (err) {
         console.error('Error fetching categories:', err);
         setError('Failed to load categories');
+      } finally{
+        setCategoryLoading(false)
       }
     };
     fetchCategories();
@@ -106,7 +110,14 @@ const SetBudgetForm = ({ open, handleClose, onSuccess }) => {
     },
   ];
   
-  
+  if (categoryLoading) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+     
+        <CircularProgress />
+      </div>
+    );
+  }
   return (
     <ReusableModal open={open} handleClose={handleClose} title="Set Monthly Budget">
       <AuthForm

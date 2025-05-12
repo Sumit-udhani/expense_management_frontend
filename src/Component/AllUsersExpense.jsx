@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Typography, TextField } from "@mui/material";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import api from "../api/axiosInterceptor";
 import ReusableTable from "./ReusableTable";
-
+import ReusableTextField from "./ReusableTextfield";
+import PaginationButton from "./PaginationButton";
 const AllUsersExpense = () => {
   const [expenses, setExpenses] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const rowsPerPage = 5;
   const [sortConfig, setSortConfig] = useState({ key: 'Title', direction: 'asc' });
+  const [loading,setLoading] = useState(true)
   useEffect(() => {
+    
     const fetchExpenses = async () => {
       try {
         const res = await api.get('/admin/expenses');
@@ -17,6 +20,9 @@ const AllUsersExpense = () => {
        
       } catch (error) {
         console.error("Error fetching expenses:", error);
+      }
+      finally{
+        setLoading(false)
       }
     };
     fetchExpenses();
@@ -76,22 +82,28 @@ const AllUsersExpense = () => {
   const totalPages = Math.ceil(filteredExpenses.length / rowsPerPage);
  
 
-  
+  if (loading) {
+    return(
+      
+      <Box display="flex" justifyContent="center" mt={4}>
+      <CircularProgress />
+    </Box>
+      ) 
+  }
 
   return (
     <>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h6">All Users Expenses</Typography>
-        <TextField
-          label="Search by Title"
-          variant="outlined"
-          size="small"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
+        <ReusableTextField
+        label="Search by Title"
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1);
+        }}
+      />
+      
       </Box>
 
       <ReusableTable
@@ -105,25 +117,23 @@ const AllUsersExpense = () => {
     
 
       <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
-        <Button
-          variant="outlined"
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          sx={{ mr: 2 }}
-        >
-          Previous
-        </Button>
+      <PaginationButton
+      label="Previous"
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+      sx={{ mr: 2 }}
+    />
         <Typography variant="body2">
           Page {currentPage} of {totalPages || 1}
         </Typography>
-        <Button
-          variant="outlined"
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages || totalPages === 0}
-          sx={{ ml: 2 }}
-        >
-          Next
-        </Button>
+        <PaginationButton
+        label="Next"
+        onClick={() =>
+          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+        }
+        disabled={currentPage === totalPages || totalPages === 0}
+        sx={{ ml: 2 }}
+      />
       </Box>
     </>
   );

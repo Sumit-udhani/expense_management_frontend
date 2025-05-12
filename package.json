@@ -16,6 +16,7 @@
     "@mui/material": "^7.0.2",
     "axios": "^1.9.0",
     "formik": "^2.4.6",
+    "lodash.debounce": "^4.0.8",
     "react": "^19.0.0",
     "react-chartjs2": "^1.2.1",
     "react-dom": "^19.0.0",

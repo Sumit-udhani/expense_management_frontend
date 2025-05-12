@@ -11,10 +11,10 @@ const AppNavigator = ({ setLoggedIn }) => {
 
     const publicPaths = ['/signup', '/login', '/forgot-password', '/reset-password', '/verify-email'];
     if (!token && publicPaths.includes(location.pathname)) {
-      return;
+      return; 
     }
 
-    
+      
     if (!token && location.pathname === '/') {
       navigate('/signup');
     } else if (token && location.pathname === '/') {
