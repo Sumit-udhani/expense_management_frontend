@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Grid, Paper, Divider } from '@mui/material';
 import api from '../api/axiosInterceptor';
-import Dropdown from '../Component/ReusableDropdown';
 const BudgetStatus = () => {
   const [loading, setLoading] = useState(true);
   const [budgets, setBudgets] = useState([]);
@@ -31,7 +30,7 @@ const BudgetStatus = () => {
           }
         });
 
-        expenseRes.data.forEach((expense) => {
+        expenseRes.data.data.forEach((expense) => {
           const catId = expense.categoryId;
           const expenseDate = new Date(expense.date);
           const now = new Date();
@@ -58,7 +57,7 @@ const BudgetStatus = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" mt={3}>
+      <Box display="flex" justifyContent="center" mt={3}> 
         <CircularProgress />
       </Box>
     );

@@ -77,7 +77,6 @@ const EmployeeLayout = ({ children, setLoggedIn }) => {
             { label: 'Dashboard', path: '/welcome' },
             { label: 'Expenses', path: '/expenses-list' },
             { label: 'Create Category', path: '/create-category' },
-            { label: 'Set Budget', path: '/set-budget' },
             { label: 'Budget Status', path: '/budget-status-category' },
             { label: 'Overall Budget Status', path: '/budget-status' },
 

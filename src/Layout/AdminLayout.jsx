@@ -84,7 +84,7 @@ const AdminLayout = ({ children, setLoggedIn }) => {
           {[
             { label: "Dashboard", path: "/welcomeAdmin" },
             { label: "All Users", path: "/admin" },
-            { label: "All Users Expenses", path: "/admin-expenses-list" },
+        
           ].map((item) => (
             <ListItem disablePadding key={item.label}>
               <ListItemButton component={Link} to={item.path}>

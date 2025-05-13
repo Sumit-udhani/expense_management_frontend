@@ -21,6 +21,7 @@ import BudgetStatus from "../pages/BudgetStatus";
 import SetBudgetPage from "../pages/SetBudgetPage";
 import OverallBudgetStatus from "../pages/OverallBudgetStatus";
 import EmployeeDashboard from "../pages/EmployeeDashboard";
+import UserDetailsPage from "../pages/UserDetailsPage";
 const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
   <Routes>
     <Route
@@ -150,6 +151,12 @@ const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
       </EmployeeLayout>
     }
     />
+    <Route path="/admin/users/:id" element={
+      <AdminLayout  setLoggedIn={setLoggedIn}>
+      <UserDetailsPage/>
+      </AdminLayout>
+    } />
+
     <Route
       path="*"
       element={

@@ -1,22 +1,15 @@
-import React from "react";
 import { TextField } from "@mui/material";
-
-const ReusableTextField = ({ label, value, onChange, placeholder, size = "small", sx = {}, ...props }) => {
-  return (
-    <TextField
-      label={label}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      variant="outlined"
-      size={size}
-      sx={{
-        minWidth: "250px",
-        ...sx,
-      }}
-      {...props}
-    />
-  );
-};
+const ReusableTextField = ({ label, value, onChange, onKeyDown, disabled,inputRef ,size="small"}) => (
+  <TextField
+    label={label}
+    value={value}
+    onChange={onChange}
+    onKeyDown={onKeyDown}
+    disabled={disabled}
+   size ={size}
+    variant="outlined"
+    inputRef={inputRef}
+  />
+);
 
 export default ReusableTextField;

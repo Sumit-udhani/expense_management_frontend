@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import {
   Box,
   Typography,
@@ -12,7 +12,8 @@ import TableActionButton from "./TableActionButton";
 import PaginationButton from "./PaginationButton";
 import AuthButton from "./AuthButton";
 import ReusableTextField from "./ReusableTextfield";
-import debounce from "lodash.debounce"
+import debounce from "lodash.debounce";
+
 const MyExpenses = () => {
   const [expenses, setExpenses] = useState([]);
   const [error, setError] = useState("");
@@ -24,21 +25,25 @@ const MyExpenses = () => {
   const [confirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
   const [sortConfig, setSortConfig] = useState({
-    key: "Title",
+    key: "title",
     direction: "asc",
   });
+  const inputRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
-  const debouncedSearch = debounce((term) => {
-    setSearchTerm(term);
-  }, 500); // 500ms delay
 
-  const fetchExpense = async () => {
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((term) => {
+        setDebouncedSearchTerm(term);
+      }, 500),
+    []
+  );
+
+  const fetchExpense = async (page, search, sortColumn, sortOrder) => {
     setLoading(true);
     try {
-      const res = await api.get(`/expense?page=${currentPage}&search=${searchTerm}`);
-      
-
+      const res = await api.get(`/expense?page=${page}&search=${search}&sortColumn=${sortColumn}&sortOrder=${sortOrder}`);
       setExpenses(res.data.data);
       setTotalPages(res.data.totalPages);
       setError("");
@@ -51,22 +56,52 @@ const MyExpenses = () => {
   };
 
   useEffect(() => {
-    fetchExpense()
-  }, [currentPage,searchTerm]);
+    fetchExpense(currentPage, debouncedSearchTerm, sortConfig.key, sortConfig.direction);
+  }, [currentPage, debouncedSearchTerm, sortConfig]);
+
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [debouncedSearchTerm]);
 
   const handleSort = (column) => {
-    setSortConfig((prev) => ({
-      key: column,
-      direction:
-        prev.key === column && prev.direction === "asc" ? "desc" : "asc",
-    }));
+    const columnKeyMap = {
+      "Title": "title",
+      "Amount": "amount",
+      "Category": "Category.name",
+      "Status": "paymentStatus",
+      "Payment Mode": "paymentMode",
+      "Date": "date"
+    };
+
+    const backendColumn = columnKeyMap[column] || "title";
+
+    setSortConfig((prev) => {
+      const newDirection = prev.key === backendColumn && prev.direction === "asc" ? "desc" : "asc";
+      setCurrentPage(1);
+      return {
+        key: backendColumn,
+        direction: newDirection,
+      };
+    });
   };
 
   const deleteExpense = async () => {
     setLoading(true);
     try {
       await api.delete(`/expense/${expenseToDelete}`);
-      fetchExpense();
+      fetchExpense(currentPage, debouncedSearchTerm, sortConfig.key, sortConfig.direction);
       setConfirmDeleteModalOpen(false);
       setExpenseToDelete(null);
     } catch (err) {
@@ -94,48 +129,9 @@ const MyExpenses = () => {
     new Date(expense.date).toLocaleDateString(),
   ];
 
- 
-  // const sortedExpenses = [...filteredExpenses].sort((a, b) => {
-  //   const key = sortConfig.key;
-  //   const getValue = (expense) => {
-  //     switch (key) {
-  //       case "Title":
-  //         return expense.title.toLowerCase();
-  //       case "Amount":
-  //         return parseFloat(expense.amount);
-  //       case "Category":
-  //         return expense.Category?.name?.toLowerCase() || "";
-  //       case "Status":
-  //         return expense.paymentStatus;
-  //       case "Payment Mode":
-  //         return expense.paymentMode;
-  //       case "Date":
-  //         return new Date(expense.date);
-  //       default:
-  //         return "";
-  //     }
-  //   };
-
-  //   const aVal = getValue(a);
-  //   const bVal = getValue(b);
-
-  //   if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-  //   if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-  //   return 0;
-  // });
-
- 
-
-
-
   return (
     <Box>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={2}
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h6">My Expenses</Typography>
         <AuthButton
           label={"Add Expense"}
@@ -152,11 +148,18 @@ const MyExpenses = () => {
           label="Search by Title"
           value={searchTerm}
           onChange={(e) => {
-            setSearchTerm(e.target.value);
+            const value = e.target.value;
+            setSearchTerm(value);
             setCurrentPage(1);
-            debouncedSearch(e.target.value)
+            debouncedSearch(value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+            }
           }}
           disabled={loading}
+          inputRef={inputRef}
         />
       </Box>
 
@@ -166,6 +169,10 @@ const MyExpenses = () => {
         </Box>
       ) : error ? (
         <Typography color="error">{error}</Typography>
+      ) :expenses.length === 0 ? (
+        <Typography mt={4} textAlign="center">
+          No expenses found.
+        </Typography>
       ) : (
         <>
           <ReusableTable
@@ -199,17 +206,10 @@ const MyExpenses = () => {
             sortConfig={sortConfig}
           />
 
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            mt={2}
-          >
+          <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
             <PaginationButton
               label="Previous"
-              onClick={() =>
-                setCurrentPage((prev) => Math.max(prev - 1, 1))
-              }
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1 || loading}
               sx={{ mr: 2 }}
             />
@@ -220,9 +220,7 @@ const MyExpenses = () => {
 
             <PaginationButton
               label="Next"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages || totalPages === 0 || loading}
               sx={{ ml: 2 }}
             />
@@ -243,7 +241,7 @@ const MyExpenses = () => {
           onSuccess={() => {
             setOpenModal(false);
             setSelectedExpense(null);
-            fetchExpense();
+            fetchExpense(currentPage, debouncedSearchTerm, sortConfig.key, sortConfig.direction);
           }}
         />
       </ReusableModal>
