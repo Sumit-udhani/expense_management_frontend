@@ -1,4 +1,4 @@
-// components/AuthFormWrapper.jsx
+
 import { Container, Box, useTheme } from '@mui/material';
 
 export default function AuthFormWrapper({ children  }) {

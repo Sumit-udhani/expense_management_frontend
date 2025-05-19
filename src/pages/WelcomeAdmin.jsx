@@ -13,7 +13,7 @@ function WelcomeAdmin() {
         color: 'text.primary',
       }}
     >
-      <Typography variant="h4" sx={{ mb: 2 }}>
+      <Typography variant="h4" sx={{ mb: 2,textAlign:'center' }}>
         Welcome on Admin Dashboard
       </Typography>
     </Box>

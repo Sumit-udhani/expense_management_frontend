@@ -1,58 +1,53 @@
-import React, { useState } from 'react';
-import { Typography } from '@mui/material';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import api from '../api/axiosInterceptor';
-import AuthFormWrapper from '../Component/AuthFormWrapper';
-import AuthForm from '../Component/AuthForm';
+import { Box } from "@mui/material";
+import { useState } from "react";
+import api from "../api/axiosInterceptor";
+import ReusableTextField from "./ReusableTextfield";
+import AuthButton from "./AuthButton";
 
 const CreateCategory = ({ onCategoryCreated }) => {
-  const [status, setStatus] = useState(null);
+  const [name, setName] = useState("");
 
-  const formik = useFormik({
-    initialValues: {
-      name: '',
-    },
-    validationSchema: Yup.object({
-      name: Yup.string().required('Category name is required'),
-    }),
-    onSubmit: async (values, { resetForm, setSubmitting }) => {
-      try {
-        const res = await api.post('/category', values);
-        setStatus({ success: 'Category created successfully' });
-        onCategoryCreated?.(res.data.category);
-        resetForm();
-      } catch (err) {
-        setStatus({
-          error: err.response?.data?.message || 'Failed to create category',
-        });
-      } finally {
-        setSubmitting(false);
-      }
-    },
-  });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name) return;
+
+    try {
+      await api.post("/category", { name });
+      onCategoryCreated();
+      setName("");
+    } catch (error) {
+      console.error("Error creating category:", error);
+    }
+  };
 
   return (
-    <AuthFormWrapper>
-      <Typography variant="h5" gutterBottom>Create Category</Typography>
-      {status?.success && (
-        <Typography color="success.main" sx={{ mb: 1 }}>
-          {status.success}
-        </Typography>
-      )}
-      {status?.error && (
-        <Typography color="error.main" sx={{ mb: 1 }}>
-          {status.error}
-        </Typography>
-      )}
-      <AuthForm
-        fields={[{ name: 'name', label: 'Category Name' }]}
-        buttonLabel="Create"
-        isLoading={formik.isSubmitting}
-        error={null}
-        formik={formik}
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      display="flex"
+      flexDirection="column"
+      gap={2}
+      mt={1}
+      width="250px" // 👈 Set a smaller fixed width for the form
+    >
+      <Box>
+        <ReusableTextField
+          label="Category Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          size="small"
+          variant="filled"
+          fullWidth // 👈 still use fullWidth so it fills the 250px parent
+        />
+      </Box>
+
+      <AuthButton
+        label="Create"
+        type="submit"
+        size="small"
+        sx={{ alignSelf: "flex-start" , minWidth: "150px", }}
       />
-    </AuthFormWrapper>
+    </Box>
   );
 };
 

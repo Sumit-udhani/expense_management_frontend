@@ -24,147 +24,76 @@ import EmployeeDashboard from "../pages/EmployeeDashboard";
 import UserDetailsPage from "../pages/UserDetailsPage";
 const AppRoutes = ({ loggedIn, setLoggedIn, handleLogout }) => (
   <Routes>
-    <Route
-      path="/"
-      element={<Navigate to={!loggedIn && "/signup" } replace />}
-    />
-    <Route
-      path="/signup"
-      element={!loggedIn ? <Signup /> : <Navigate to="/welcome" replace />}
-    />
-    <Route
-      path="/login"
-      element={
-        !loggedIn ? (
-          <Login setLoggedIn={setLoggedIn} />
-        ) : (
-          <Navigate to="/welcome" replace />
-        )
-      }
-    />
-    <Route
-      path="/verify-email"
-      element={!loggedIn ? <VerifyEmail /> : <Navigate to="/welcome" replace />}
-    />
-    <Route
-      path="/forgot-password"
-      element={
-        !loggedIn ? <ForgotPassword /> : <Navigate to="/welcome" replace />
-      }
-    />
-    <Route
-      path="/reset-password"
-      element={
-        !loggedIn ? <ResetPassword /> : <Navigate to="/welcome" replace />
-      }
-    />
-    <Route
-      path="/welcome"
-      element={
-        loggedIn ? (
-          <EmployeeLayout setLoggedIn={setLoggedIn}>
-          <EmployeeDashboard/>
-          </EmployeeLayout>
-        ) : (
-          <Navigate to="/login" replace />
-        )
-      }
-    />
-    <Route
-      path="/admin"
-      element={
-        <ProtectedRoute roleRequired="Admin">
-        <AdminLayout setLoggedIn={setLoggedIn} >
-        <AdminDashboard setLoggedIn={setLoggedIn} />
-        </AdminLayout>
-        </ProtectedRoute>
-      }
-    />
+  <Route
+  path="/"
+  element={!loggedIn ? <Navigate to="/signup" replace /> : <Navigate to="/welcome" replace />}
+/>
 
-    <Route path="/unauthorized" element={<UnAuthorize />} />
-    <Route
-      path="/create-category"
-      element={
-        <EmployeeLayout setLoggedIn={setLoggedIn}>
-          <CreateCategory />
-        </EmployeeLayout>
-      }
-    />
-    <Route 
-    path="/add-expense"
-    element={
-      <EmployeeLayout setLoggedIn={setLoggedIn}>
-        <AddExpense/>
-      </EmployeeLayout>
-    }
-    />
-    <Route
-    path="/expenses-list"
-    element ={
-      <EmployeeLayout setLoggedIn={setLoggedIn}>
-      <MyExpenses/>
-      </EmployeeLayout>
-    }
-    />
-    <Route 
-    path="/admin-expenses-list"
-    element ={
-      <AdminLayout setLoggedIn={setLoggedIn}>
-      <AllUsersExpense/>
-      </AdminLayout>
-    }
-    />
-    <Route
-    path="/welcomeAdmin"
-    element={
-        loggedIn ?(
-          <AdminLayout setLoggedIn={setLoggedIn}>
-          <WelcomeAdmin/>
-          </AdminLayout>
-        ):(
-          <Navigate to="/login" replace />
-        )
-     
-    }
-    />
-    <Route 
-    path="/set-budget"
-    element={
-      <EmployeeLayout setLoggedIn={setLoggedIn}>
-      <SetBudgetPage/>
-      </EmployeeLayout>
-    }
-    />
-    <Route 
-    path="/budget-status-category"
-    element ={
-      <EmployeeLayout  setLoggedIn={setLoggedIn} >
-      <BudgetStatus/>
-      </EmployeeLayout>
-    }
-    />
-    <Route 
-    path="/budget-status"
-    element ={
-      <EmployeeLayout  setLoggedIn={setLoggedIn} >
-     <OverallBudgetStatus/>
-      </EmployeeLayout>
-    }
-    />
-    <Route path="/admin/users/:id" element={
-      <AdminLayout  setLoggedIn={setLoggedIn}>
-      <UserDetailsPage/>
-      </AdminLayout>
-    } />
+<Route
+  path="/signup"
+  element={!loggedIn ? <Signup /> : <Navigate to="/welcome" replace />}
+/>
 
-    <Route
-      path="*"
-      element={
-        <div style={{ textAlign: "center", fontSize: "30px" }}>
-          Page not found
-        </div>
-      }
-    />
+<Route
+  path="/login"
+  element={!loggedIn ? <Login setLoggedIn={setLoggedIn} /> : <Navigate to="/welcome" replace />}
+/>
+
+<Route
+  path="/verify-email"
+  element={!loggedIn ? <VerifyEmail /> : <Navigate to="/welcome" replace />}
+/>
+
+<Route
+  path="/forgot-password"
+  element={!loggedIn ? <ForgotPassword /> : <Navigate to="/welcome" replace />}
+/>
+
+<Route
+  path="/reset-password"
+  element={!loggedIn ? <ResetPassword /> : <Navigate to="/welcome" replace />}
+/>
+{loggedIn && (
+  <Route path="/welcome" element={<EmployeeLayout setLoggedIn={setLoggedIn} />}>
+    <Route index element={<EmployeeDashboard />} />
+    <Route path="create-category" element={<CreateCategory />} />
+    <Route path="add-expense" element={<AddExpense />} />
+    <Route path="expenses-list" element={<MyExpenses />} />
+    <Route path="set-budget" element={<SetBudgetPage />} />
+    <Route path="budget-status-category" element={<BudgetStatus />} />
+    <Route path="budget-status" element={<OverallBudgetStatus />} />
+  </Route>
+)}
+
+{/* ✅ ADMIN ROUTES */}
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute roleRequired="Admin">
+      <AdminLayout setLoggedIn={setLoggedIn}/>
+        
+    
+    </ProtectedRoute>
+  }
+>
+<Route index element={<WelcomeAdmin/>} />
+<Route path="admin" element={<AdminDashboard/>} />
+<Route path="users/:id" element={ <UserDetailsPage />} />
+
+</Route>
+
+<Route path="/unauthorized" element={<UnAuthorize />} />
+
+{/* Catch-all 404 */}
+<Route
+  path="*"
+  element={
+    <div style={{ textAlign: "center", fontSize: "30px" }}>
+      Page not found
+    </div>
+  }
+/>
+
   </Routes>
 );
 

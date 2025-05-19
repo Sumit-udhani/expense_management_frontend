@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
-const ReusableModal = ({ open, handleClose, title, children, maxWidth = 600 }) => {
+const ReusableModal = ({ open, handleClose, title, children, maxWidth = 900 }) => {
   return (
     <Modal
       open={open}
@@ -10,10 +10,10 @@ const ReusableModal = ({ open, handleClose, title, children, maxWidth = 600 }) =
       aria-labelledby="modal-title"
       sx={{
         display: 'flex',
-        alignItems: 'center', 
-        justifyContent: 'center', 
+        alignItems: 'center',
+        justifyContent: 'center',
         overflow: 'auto',
-        p: 2, 
+        p: 2,
       }}
     >
       <Box
@@ -22,11 +22,11 @@ const ReusableModal = ({ open, handleClose, title, children, maxWidth = 600 }) =
           boxShadow: 24,
           p: 3,
           width: '100%',
-          maxWidth,
+          maxWidth,           // ✅ will be 900 by default
           borderRadius: 2,
           outline: 'none',
-          maxHeight: '90vh', 
-          overflowY: 'auto', 
+          maxHeight: '90vh',
+          overflowY: 'auto',
         }}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>

@@ -11,6 +11,8 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const rowsPerPage = 5;
   const [sortConfig, setSortConfig] = useState({
     key: "Name",
@@ -23,27 +25,36 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers(currentPage, searchTerm, sortConfig);
+  }, [currentPage, searchTerm, sortConfig]);
+  
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page, search = "", sort = sortConfig) => {
     try {
-      const res = await api.get("/admin/users");
+      const res = await api.get(`/admin/users`, {
+        params: {
+          page,
+          search,
+          sortColumn: sort.key.toLowerCase(),
+          sortOrder: sort.direction,
+        },
+      });
       setUsers(res.data.users || []);
+      setTotalPages(res.data.totalPages);
     } catch (err) {
       console.error("Failed to fetch users:", err);
     } finally {
       setLoading(false);
     }
   };
-
+  
   const handleSort = (column) => {
-    setSortConfig((prev) => ({
-      key: column,
-      direction:
-        prev.key === column && prev.direction === "asc" ? "desc" : "asc",
-    }));
+    const direction =
+      sortConfig.key === column && sortConfig.direction === "asc" ? "desc" : "asc";
+    setSortConfig({ key: column, direction });
+    setCurrentPage(1); // reset to first page on sort change
   };
+  
 
   const toggleUserStatus = async () => {
     if (!selectedUser) return;
@@ -64,43 +75,9 @@ const AdminDashboard = () => {
     }
   };
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    const key = sortConfig.key;
 
-    const getValue = (user) => {
-      switch (key) {
-        case "ID":
-          return user.id;
-        case "Name":
-          return user.name.toLowerCase();
-        case "Email":
-          return user.email.toLowerCase();
-        case "Role":
-          return user.Role?.name?.toLowerCase() || "";
-        case "Status":
-          return user.isActive ? "Active" : "Inactive";
-        default:
-          return "";
-      }
-    };
-
-    const aVal = getValue(a);
-    const bVal = getValue(b);
-
-    if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-    if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  const totalPages = Math.ceil(sortedUsers.length / rowsPerPage);
-  const paginatedUsers = sortedUsers.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
+  
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={4}>
@@ -129,42 +106,49 @@ const AdminDashboard = () => {
           }}
         />
       </Box>
+      {
+        users.length === 0?(
+          <Typography mt={4} textAlign="center">
+          No users found.
+        </Typography>
+        ):(
 
-      <ReusableTable
-        title=""
-        columns={["ID", "Name", "Email", "Role", "Status", "Actions"]}
-        rows={paginatedUsers}
-        getRowData={(user) => [
-          user.id,
-          user.name,
-          user.email,
-          user.Role?.name || "N/A",
-          user.isActive ? "Active" : "Inactive",
-        ]}
-        onSort={handleSort}
-        sortConfig={sortConfig}
-        actions={(user) => (
-          <Box display="flex" gap={1}>
-            <TableActionButton
-              label={user.isActive ? "Deactivate" : "Activate"}
-              color={user.isActive ? "error" : "success"}
-              isLoading={loadingUserId === user.id}
-              onClick={() => {
-                setSelectedUser(user);
-                setConfirmModalOpen(true);
-              }}
-            />
-            <TableActionButton
-              label="View"
-              color="info"
-              onClick={() => handleViewDetailsPage(user)}
-            />
-          </Box>
-        )}
-        
-        
-      />
-
+          <ReusableTable
+            title=""
+            columns={["ID", "Name", "Email", "Role", "Status", "Actions"]}
+            rows={users}
+            getRowData={(user) => [
+              user.id,
+              user.name,
+              user.email,
+              user.Role?.name || "N/A",
+              user.isActive ? "Active" : "Inactive",
+            ]}
+            onSort={handleSort}
+            sortConfig={sortConfig}
+            actions={(user) => (
+              <Box display="flex" gap={1}>
+                <TableActionButton
+                  label={user.isActive ? "Deactivate" : "Activate"}
+                  color={user.isActive ? "error" : "success"}
+                  isLoading={loadingUserId === user.id}
+                  onClick={() => {
+                    setSelectedUser(user);
+                    setConfirmModalOpen(true);
+                  }}
+                />
+                <TableActionButton
+                  label="View"
+                  color="info"
+                  onClick={() => handleViewDetailsPage(user)}
+                />
+              </Box>
+            )}
+            
+            
+          />
+        )
+      }
       <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
         <PaginationButton
           label="Previous"
@@ -184,6 +168,7 @@ const AdminDashboard = () => {
           sx={{ ml: 2 }}
         />
       </Box>
+
 
       <ReusableModal
         open={confirmModalOpen}

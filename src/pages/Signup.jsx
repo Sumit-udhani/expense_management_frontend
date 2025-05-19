@@ -42,15 +42,9 @@ export default function Signup() {
 
   return (
     <AuthFormWrapper>
-      <Typography variant="h4" gutterBottom>Get started with Us</Typography>
-      <p style={{ color: '#cbd5e1' }}>Register a new User</p>
-      <Typography
-      variant="body1"
-      color={status.success ? 'success.main' : 'error.main'}
-      sx={{ mt: 2 }}
-    >
-      {status.success || status.error}
-    </Typography>
+      <Typography variant="h4" gutterBottom sx={{textAlign:'center'}}>Get started with Us</Typography>
+      <p style={{ color: '#cbd5e1', }}>Register a new User</p>
+     
     
       <AuthForm
         fields={[

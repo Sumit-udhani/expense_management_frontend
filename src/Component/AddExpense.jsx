@@ -128,6 +128,7 @@ const AddExpenseForm = ({ onSuccess, initialData }) => {
       buttonLabel={initialData ? 'Edit Expense' : 'Add Expense'}
       isLoading={isLoading}
       error={error}
+      sx={{ alignSelf: "flex-start" , minWidth: "150px", }}
     />
   );
 };

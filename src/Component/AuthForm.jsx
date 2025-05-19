@@ -8,7 +8,8 @@ export default function AuthForm({
   isLoading,
   error,
   footer,
-  formik
+  formik,
+  ...props
 }) {
   return (
     <>
@@ -61,6 +62,7 @@ export default function AuthForm({
                 helperText={formik.touched[field.name] && formik.errors[field.name]}
                 fullWidth
                 margin="normal"
+               
               />
             );
           }
@@ -70,6 +72,7 @@ export default function AuthForm({
           variant="contained"
           fullWidth
           sx={{ mt: 2, position: 'relative' }}
+          {...props}
         >
           {isLoading ? (
             <>

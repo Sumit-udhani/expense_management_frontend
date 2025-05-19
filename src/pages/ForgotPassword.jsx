@@ -6,8 +6,11 @@ import AuthForm from '../Component/AuthForm';
 import { useFormik, validateYupSchema } from 'formik';
 import * as Yup from 'yup';
 import api from '../api/axiosInterceptor';
+import AuthButton from '../Component/AuthButton';
+import { useNavigate } from 'react-router-dom';
 function ForgotPassword() {
   const [message, setMessage] = useState(''); 
+  const navigate = useNavigate()
   const formik = useFormik({
     initialValues: {
       email:''
@@ -30,6 +33,8 @@ function ForgotPassword() {
 
 
   return (
+    <> 
+    <AuthButton label={"back"} onClick={()=> navigate('/login')}/>
     <AuthFormWrapper>
       <Typography variant="h4" gutterBottom>Forgot Password</Typography>
       {message && <Typography color="primary" sx={{ mt: 1 }}>{message}</Typography>}
@@ -44,6 +49,7 @@ function ForgotPassword() {
         error={formik.status?.error}
       />
     </AuthFormWrapper>
+    </>
   );
 }
 
