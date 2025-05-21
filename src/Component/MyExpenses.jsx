@@ -11,22 +11,20 @@ import {
   Stack,
   useTheme,
 } from "@mui/material";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ImageIcon from "@mui/icons-material/Image";
 import api from "../api/axiosInterceptor";
 import ReusableTable from "./ReusableTable";
 import ReusableModal from "./ReusableModal";
 import AddExpenseForm from "./AddExpense";
-import TableActionButton from "./TableActionButton";
-import PaginationButton from "./PaginationButton";
 import AuthButton from "./AuthButton";
 import ReusableTextField from "./ReusableTextfield";
 import debounce from "lodash.debounce";
 import CreateCategory from "./CategoryForm";
-
+import Loader from "./Loader";
+import StyledBox from "./StyledBox";
 const MyExpenses = () => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const [expenses, setExpenses] = useState([]);
   const [error, setError] = useState("");
@@ -70,7 +68,12 @@ const MyExpenses = () => {
   };
 
   useEffect(() => {
-    fetchExpense(currentPage, debouncedSearchTerm, sortConfig.key, sortConfig.direction);
+    fetchExpense(
+      currentPage,
+      debouncedSearchTerm,
+      sortConfig.key,
+      sortConfig.direction
+    );
   }, [currentPage, debouncedSearchTerm, sortConfig]);
 
   useEffect(() => () => debouncedSearch.cancel(), []);
@@ -91,7 +94,8 @@ const MyExpenses = () => {
     const backendColumn = columnKeyMap[column] || "title";
     setSortConfig((prev) => ({
       key: backendColumn,
-      direction: prev.key === backendColumn && prev.direction === "asc" ? "desc" : "asc",
+      direction:
+        prev.key === backendColumn && prev.direction === "asc" ? "desc" : "asc",
     }));
     setCurrentPage(1);
   };
@@ -100,7 +104,12 @@ const MyExpenses = () => {
     setLoading(true);
     try {
       await api.delete(`/expense/${expenseToDelete}`);
-      fetchExpense(currentPage, debouncedSearchTerm, sortConfig.key, sortConfig.direction);
+      fetchExpense(
+        currentPage,
+        debouncedSearchTerm,
+        sortConfig.key,
+        sortConfig.direction
+      );
       setConfirmDeleteModalOpen(false);
       setExpenseToDelete(null);
     } catch (err) {
@@ -110,7 +119,14 @@ const MyExpenses = () => {
     }
   };
 
-  const columns = ["Title", "Amount", "Category", "Status", "Payment Mode", "Date"];
+  const columns = [
+    "Title",
+    "Amount",
+    "Category",
+    "Status",
+    "Payment Mode",
+    "Date",
+  ];
 
   const getRowData = (expense) => [
     expense.title,
@@ -168,9 +184,7 @@ const MyExpenses = () => {
       </Box>
 
       {loading ? (
-        <Box display="flex" justifyContent="center" mt={4}>
-          <CircularProgress />
-        </Box>
+       <Loader/>
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : expenses.length === 0 ? (
@@ -179,65 +193,100 @@ const MyExpenses = () => {
         </Typography>
       ) : (
         <>
-        <Box sx={{ overflowX: "auto" }}>
-        <ReusableTable
-          columns={[...columns, "Actions"]}
-          rows={expenses}
-          getRowData={getRowData}
-          actions={(expense) => (
-            <Box display="flex" flexWrap="wrap" gap={1}>
-              <TableActionButton
-                label="Edit"
-                color="primary"
-                onClick={() => {
-                  setSelectedExpense(expense);
-                  setOpenModal(true);
-                }}
-                disabled={loading}
-              />
-              <TableActionButton
-                label="Delete"
-                color="error"
-                onClick={() => {
-                  setExpenseToDelete(expense.id);
-                  setConfirmDeleteModalOpen(true);
-                }}
-                disabled={loading}
-              />
-              <TableActionButton
-                label="View"
-                color="info"
-                onClick={() => {
-                  setSelectedExpense(expense);
-                  setViewModalOpen(true);
-                }}
-                disabled={loading}
-              />
-            </Box>
-          )}
-          onSort={handleSort}
-          sortConfig={sortConfig}
-        />
-      </Box>
-      
+          <Box sx={{ overflowX: "auto" }}>
+            <ReusableTable
+              columns={[...columns, "Actions"]}
+              rows={expenses}
+              getRowData={getRowData}
+              actions={(expense) => (
+                <Box display="flex" flexWrap="wrap" gap={1}>
+                  <AuthButton
+                    label="Edit"
+                    color="primary"
+                    onClick={() => {
+                      setSelectedExpense(expense);
+                      setOpenModal(true);
+                    }}
+                    variant="outlined"
+                    disabled={loading}
+                    sx={{
+                      py: 0.5,
+                      px: 1.5,
+                      minWidth: "auto",
+                      fontSize: "0.75rem",
+                    }}
+                  />
+                  <AuthButton
+                    label="Delete"
+                    color="error"
+                    onClick={() => {
+                      setExpenseToDelete(expense.id);
+                      setConfirmDeleteModalOpen(true);
+                    }}
+                    variant="outlined"
+                    disabled={loading}
+                    sx={{
+                      py: 0.5,
+                      px: 1.5,
+                      minWidth: "auto",
+                      fontSize: "0.75rem",
+                    }}
+                  />
+                  <AuthButton
+                    label="View"
+                    color="info"
+                    onClick={() => {
+                      setSelectedExpense(expense);
+                      setViewModalOpen(true);
+                    }}
+                    variant="outlined"
+                    disabled={loading}
+                    sx={{
+                      py: 0.5,
+                      px: 1.5,
+                      minWidth: "auto",
+                      fontSize: "0.75rem",
+                    }}
+                  />
+                </Box>
+              )}
+              onSort={handleSort}
+              sortConfig={sortConfig}
+            />
+          </Box>
 
-          <Stack direction="row" justifyContent="center" alignItems="center" mt={2} spacing={2}>
-            <PaginationButton
+          <Stack
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            mt={2}
+            spacing={2}
+          >
+            <AuthButton
               label="Previous"
+              variant="outlined"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1 || loading}
+              sx={{ px: 2, py: 0.5, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
             />
-            <Typography variant="body2">Page {currentPage} of {totalPages || 1}</Typography>
-            <PaginationButton
+            <Typography variant="body2">
+              Page {currentPage} of {totalPages || 1}
+            </Typography>
+            <AuthButton
               label="Next"
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages || totalPages === 0 || loading}
+              variant="outlined"
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={
+                currentPage === totalPages || totalPages === 0 || loading
+              }
+              sx={{ px: 2, py: 0.5, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
             />
           </Stack>
         </>
       )}
 
-   
       <ReusableModal
         open={openModal}
         handleClose={() => {
@@ -251,7 +300,12 @@ const MyExpenses = () => {
           onSuccess={() => {
             setOpenModal(false);
             setSelectedExpense(null);
-            fetchExpense(currentPage, debouncedSearchTerm, sortConfig.key, sortConfig.direction);
+            fetchExpense(
+              currentPage,
+              debouncedSearchTerm,
+              sortConfig.key,
+              sortConfig.direction
+            );
           }}
         />
       </ReusableModal>
@@ -276,10 +330,25 @@ const MyExpenses = () => {
         }}
         title="Confirm Deletion"
       >
-        <Typography mb={2}>Are you sure you want to delete this expense?</Typography>
+        <Typography mb={2}>
+          Are you sure you want to delete this expense?
+        </Typography>
         <Box display="flex" justifyContent="flex-end" gap={2}>
-          <TableActionButton label="Cancel" color="primary" onClick={() => setConfirmDeleteModalOpen(false)} />
-          <TableActionButton label="Delete" color="error" onClick={deleteExpense} />
+        <AuthButton
+        label="Cancel"
+        color="primary"
+        variant="outlined"
+        onClick={() => setConfirmDeleteModalOpen(false)}
+        sx={{ px: 2, py: 0.6, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+      />
+      <AuthButton
+        label="Delete"
+        color="error"
+        variant="outlined"
+        onClick={deleteExpense}
+        sx={{ px: 2, py: 0.6, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+      />
+      
         </Box>
       </ReusableModal>
 
@@ -290,61 +359,57 @@ const MyExpenses = () => {
           setSelectedExpense(null);
         }}
         title="Expense Details"
-        maxWidth="md"  
-        fullWidth   
+        maxWidth="md"
+        fullWidth
       >
         <Divider sx={{ my: 1, borderColor: "#3b82f6" }} />
+
         {selectedExpense ? (
           <Box component={Paper} elevation={0}>
-          <Grid container spacing={2}>
-          {[
-            { label: "Title", value: selectedExpense.title },
-            { label: "Amount", value: `₹${selectedExpense.amount}` },
-            { label: "Category", value: selectedExpense.Category?.name || "N/A" },
-            { label: "Status", value: selectedExpense.paymentStatus },
-            { label: "Payment Mode", value: selectedExpense.paymentMode },
-            {
-              label: "Date",
-              value: new Date(selectedExpense.date).toLocaleDateString(),
-            },
-          ].map(({ label, value }) => (
-            <Grid item xs={12} sm={6} md={4} key={label}>
-              <Typography variant="caption" color="text.secondary">{label}</Typography>
-              <Typography>{value}</Typography>
+            <Grid container spacing={2}>
+              {[
+                { label: "Title", value: selectedExpense.title },
+                { label: "Amount", value: `₹${selectedExpense.amount}` },
+                {
+                  label: "Category",
+                  value: selectedExpense.Category?.name || "N/A",
+                },
+                { label: "Status", value: selectedExpense.paymentStatus },
+                { label: "Payment Mode", value: selectedExpense.paymentMode },
+                {
+                  label: "Date",
+                  value: new Date(selectedExpense.date).toLocaleDateString(),
+                },
+              ].map(({ label, value }) => (
+                <Grid item xs={12} sm={6} md={4} key={label}>
+                  <Typography variant="caption" color="text.secondary">
+                    {label}
+                  </Typography>
+                  <Typography>{value}</Typography>
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
-        
 
             {selectedExpense.attachment && (
-              <Box mt={2}>
-                <Paper
-                  elevation={3}
+              
+
+              <StyledBox>
+                <ImageIcon color="secondary" />
+                <Link
+                  href={`http://localhost:8085/${selectedExpense.attachment}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   sx={{
-                    p: 3,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    borderRadius: "8px",
-                    border: "1px solid",
-                    backgroundColor: "transparent",
+                    wordBreak: "break-all",
+                    textDecoration: "none",
                     color: "#f9fafb",
-                    width: "100%",
-                    overflow: "hidden",
-                    height: "90px",
+                    textAlign: "center",
                   }}
                 >
-                  <ImageIcon color="secondary" />
-                  <Link
-                    href={`http://localhost:8085/${selectedExpense.attachment}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{ wordBreak: "break-all", textDecoration: "none", color: "#f9fafb" }}
-                  >
-                    Attachment
-                  </Link>
-                </Paper>
-              </Box>
+                  Attachment
+                </Link>
+              </StyledBox>
+              
             )}
           </Box>
         ) : (

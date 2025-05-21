@@ -1,16 +1,23 @@
 import { Button } from '@mui/material';
 import React from 'react';
 
-const AuthButton = ({ label, onClick, isLoading,...props }) => {
+const AuthButton = ({
+  label,
+  onClick,
+  variant = "contained",
+  isLoading,
+  size = "medium", 
+  ...props
+}) => {
   return (
     <Button
       type="button"
-     
-      variant="contained"
+      variant={variant}
       color="primary"
       onClick={onClick}
       disabled={isLoading}
-      sx={{ mt: 3,ml:5,mb:1 }}
+      size={size}
+      sx={{ mt: 1, ml: 1, mb: 1, px: 2, py: 0.5 }}
       {...props}
     >
       {label}

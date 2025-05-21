@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, CircularProgress } from "@mui/material";
+import { Box, Typography, CircularProgress , Stack } from "@mui/material";
 import api from "../api/axiosInterceptor";
 import ReusableTable from "../Component/ReusableTable";
-import TableActionButton from "../Component/TableActionButton";
+
 import ReusableModal from "../Component/ReusableModal";
 import ReusableTextField from "../Component/ReusableTextfield";
-import PaginationButton from "../Component/PaginationButton";
+
 import { useNavigate } from "react-router-dom";
+import AuthButton from "../Component/AuthButton";
+import Loader from "../Component/Loader";
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,7 +54,7 @@ const AdminDashboard = () => {
     const direction =
       sortConfig.key === column && sortConfig.direction === "asc" ? "desc" : "asc";
     setSortConfig({ key: column, direction });
-    setCurrentPage(1); // reset to first page on sort change
+    setCurrentPage(1); 
   };
   
 
@@ -80,9 +82,7 @@ const AdminDashboard = () => {
   
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" mt={4}>
-        <CircularProgress />
-      </Box>
+     <Loader/>
     );
   }
   const handleViewDetailsPage = (user) => {
@@ -128,20 +128,25 @@ const AdminDashboard = () => {
             sortConfig={sortConfig}
             actions={(user) => (
               <Box display="flex" gap={1}>
-                <TableActionButton
-                  label={user.isActive ? "Deactivate" : "Activate"}
-                  color={user.isActive ? "error" : "success"}
-                  isLoading={loadingUserId === user.id}
-                  onClick={() => {
-                    setSelectedUser(user);
-                    setConfirmModalOpen(true);
-                  }}
-                />
-                <TableActionButton
-                  label="View"
-                  color="info"
-                  onClick={() => handleViewDetailsPage(user)}
-                />
+              <AuthButton
+              label={user.isActive ? "Deactivate" : "Activate"}
+              color={user.isActive ? "error" : "success"}
+              isLoading={loadingUserId === user.id}
+              onClick={() => {
+                setSelectedUser(user);
+                setConfirmModalOpen(true);
+              }}
+              variant="outlined"
+              disabled={loading}
+              size="small"  
+            />
+               <AuthButton
+               label={"view"}
+               color={"info"}
+               size="small"
+               onClick={() => handleViewDetailsPage(user)}
+               variant="outlined"
+               />
               </Box>
             )}
             
@@ -149,25 +154,35 @@ const AdminDashboard = () => {
           />
         )
       }
-      <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
-        <PaginationButton
-          label="Previous"
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          sx={{ mr: 2 }}
-        />
+      <Stack
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      mt={2}
+      spacing={2}
+    >
+      <AuthButton
+      label="Previous"
+      variant="outlined"
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1 || loading}
+      sx={{ px: 2, py: 0.5, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+    />
         <Typography variant="body2">
           Page {currentPage} of {totalPages || 1}
         </Typography>
-        <PaginationButton
-          label="Next"
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages || totalPages === 0}
-          sx={{ ml: 2 }}
-        />
-      </Box>
+        <AuthButton
+        label="Next"
+        variant="outlined"
+        onClick={() =>
+          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+        }
+        disabled={
+          currentPage === totalPages || totalPages === 0 || loading
+        }
+        sx={{ px: 2, py: 0.5, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+      />
+      </Stack>
 
 
       <ReusableModal
@@ -183,22 +198,25 @@ const AdminDashboard = () => {
           {selectedUser?.isActive ? "deactivate" : "activate"}{" "}
           {selectedUser?.name}?
         </Typography>
-        <Box display="flex" justifyContent="flex-end">
-          <TableActionButton
-            label={"Cancel"}
-            color="primary"
-            onClick={() => {
-              setConfirmModalOpen(false);
-              setSelectedUser(null);
-            }}
-          />
-          <TableActionButton
-            label={selectedUser?.isActive ? "Deactivate" : "Activate"}
-            color={selectedUser?.isActive ? "error" : "success"}
-            onClick={toggleUserStatus}
-            isLoading={isStatusUpdating}
-            sx={{ minWidth: 100 }}
-          />
+        <Box display="flex" justifyContent="flex-end" gap={2}>
+        <AuthButton
+        label="Cancel"
+        color="primary"
+        variant="outlined"
+        onClick={() => {
+          setConfirmModalOpen(false);
+          setSelectedUser(null);
+        }}
+        sx={{ px: 2, py: 0.6, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+      />
+      <AuthButton
+      label={selectedUser?.isActive ? "Deactivate" : "Activate"}
+      color={selectedUser?.isActive ? "error" : "success"}
+      onClick={toggleUserStatus}
+      isLoading={isStatusUpdating}
+      variant="outlined"
+      sx={{ px: 2, py: 0.6, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+    />
         </Box>
       </ReusableModal>
     </>

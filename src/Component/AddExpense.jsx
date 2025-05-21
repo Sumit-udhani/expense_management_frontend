@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import api from '../api/axiosInterceptor';
 import AuthForm from './AuthForm';
 import { CircularProgress } from '@mui/material';
+import Loader from './Loader';
 
 const AddExpenseForm = ({ onSuccess, initialData }) => {
   const [categories, setCategories] = useState([]);
@@ -115,10 +116,7 @@ const AddExpenseForm = ({ onSuccess, initialData }) => {
   ];
   if (categoryLoading) {
     return (
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-      
-        <CircularProgress />
-      </div>
+      <Loader/>
     );
   }
   return (

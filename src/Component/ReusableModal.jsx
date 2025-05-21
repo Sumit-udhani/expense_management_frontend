@@ -22,7 +22,7 @@ const ReusableModal = ({ open, handleClose, title, children, maxWidth = 900 }) =
           boxShadow: 24,
           p: 3,
           width: '100%',
-          maxWidth,           // ✅ will be 900 by default
+          maxWidth,          
           borderRadius: 2,
           outline: 'none',
           maxHeight: '90vh',

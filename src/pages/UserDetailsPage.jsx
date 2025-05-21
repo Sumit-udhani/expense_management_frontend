@@ -10,12 +10,13 @@ import {
 import { useParams } from 'react-router-dom';
 import ReusableTable from '../Component/ReusableTable';
 import api from '../api/axiosInterceptor';
-import TableActionButton from '../Component/TableActionButton';
+
 import ReusableModal from '../Component/ReusableModal';
 import ImageIcon from '@mui/icons-material/Image';
-import PaginationButton from '../Component/PaginationButton';
-import ReusableTextField from '../Component/ReusableTextfield';
 
+import ReusableTextField from '../Component/ReusableTextfield';
+import AuthButton from '../Component/AuthButton';
+import Loader from '../Component/Loader';
 const UserDetailsPage = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
@@ -78,9 +79,7 @@ const UserDetailsPage = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" mt={4}>
-        <CircularProgress />
-      </Box>
+      <Loader/>
     );
   }
 
@@ -140,40 +139,47 @@ const UserDetailsPage = () => {
         getRowData={getRowData}
         actions={(expense) => (
           <Box display="flex" gap={1}>
-            <TableActionButton
-              label="View"
-              color="info"
-              onClick={() => {
-                setSelectedExpense(expense);
-                setViewModalOpen(true);
-              }}
-              disabled={loading}
-            />
+          <AuthButton
+          label={"view"}
+          color={"info"}
+          size="small"
+          onClick={() => {
+            setSelectedExpense(expense);
+            setViewModalOpen(true);
+          }}
+          variant="outlined"
+          />
           </Box>
         )}
         onSort={handleSort}
         sortConfig={sortConfig}
       />
-
-      {/* Pagination Controls */}
-      <Box mt={2} sx={{display:'flex',justifyContent:'center',alignItems:'center',textAlign:'center'}}>
-        <PaginationButton
-          label="Prev"
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
-          sx={{ mr: 2 }}
-        />
+     
+      
+      <Box mt={2} gap={2} sx={{display:'flex',justifyContent:'center',alignItems:'center',textAlign:'center'}}>
+      <AuthButton
+      label="Prev"
+      variant="outlined"
+      onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+      disabled={page === 1 || loading}
+      sx={{ px: 2, py: 0.5, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+    />
         <Typography>
           Page {page} of {totalPages}
         </Typography>
-        <PaginationButton
-          label="Next"
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={page === totalPages}
-          sx={{ ml: 2 }}
-        />
+        <AuthButton
+        label="Next"
+        variant="outlined"
+        onClick={() =>
+          setPage((prev) => Math.min(prev + 1, totalPages))
+        }
+        disabled={
+         page === totalPages || totalPages === 0 || loading
+        }
+        sx={{ px: 2, py: 0.5, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+      />
       </Box>
-
+      
       {/* Expense Detail Modal */}
       <ReusableModal
         open={viewModalOpen}

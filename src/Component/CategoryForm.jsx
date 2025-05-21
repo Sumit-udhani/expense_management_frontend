@@ -28,7 +28,7 @@ const CreateCategory = ({ onCategoryCreated }) => {
       flexDirection="column"
       gap={2}
       mt={1}
-      width="250px" // 👈 Set a smaller fixed width for the form
+      width="250px" 
     >
       <Box>
         <ReusableTextField
@@ -37,7 +37,7 @@ const CreateCategory = ({ onCategoryCreated }) => {
           onChange={(e) => setName(e.target.value)}
           size="small"
           variant="filled"
-          fullWidth // 👈 still use fullWidth so it fills the 250px parent
+          fullWidth 
         />
       </Box>
 

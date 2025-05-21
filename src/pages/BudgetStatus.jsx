@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Grid, Paper, Divider } from '@mui/material';
 import api from '../api/axiosInterceptor';
+import Loader from '../Component/Loader';
 const BudgetStatus = () => {
   const [loading, setLoading] = useState(true);
   const [budgets, setBudgets] = useState([]);
@@ -57,9 +58,7 @@ const BudgetStatus = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" mt={3}> 
-        <CircularProgress />
-      </Box>
+      <Loader/>
     );
   }
 

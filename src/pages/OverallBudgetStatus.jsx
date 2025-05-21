@@ -11,6 +11,7 @@ import api from "../api/axiosInterceptor";
 import Dropdown from "../Component/ReusableDropdown";
 import SetBudgetForm from "../Component/setBudgetForm";
 import AuthButton from "../Component/AuthButton";
+import Loader from "../Component/Loader";
 
 const OverallBudgetStatus = () => {
   const [loading, setLoading] = useState(true);
@@ -45,9 +46,7 @@ const OverallBudgetStatus = () => {
 
   if (loading)
     return (
-      <Box display="flex" justifyContent="center" mt={3}>
-        <CircularProgress />
-      </Box>
+     <Loader/>
     );
   if (error) return <Typography color="error">{error}</Typography>;
 

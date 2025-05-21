@@ -3,7 +3,8 @@ import { Box, Typography, CircularProgress } from "@mui/material";
 import api from "../api/axiosInterceptor";
 import ReusableTable from "./ReusableTable";
 import ReusableTextField from "./ReusableTextfield";
-import PaginationButton from "./PaginationButton";
+import Loader from "./Loader";
+
 const AllUsersExpense = () => {
   const [expenses, setExpenses] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -85,9 +86,7 @@ const AllUsersExpense = () => {
   if (loading) {
     return(
       
-      <Box display="flex" justifyContent="center" mt={4}>
-      <CircularProgress />
-    </Box>
+      <Loader/>
       ) 
   }
 

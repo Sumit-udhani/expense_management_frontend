@@ -2,21 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Typography, Box, Grid, CircularProgress } from "@mui/material";
 import api from "../api/axiosInterceptor";
 import Dropdown from "../Component/ReusableDropdown";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
-
-const PIE_COLORS = ["#F472B6", "#FBBF24", "#3B82F6"];
-
+import BarChartBox from "../Component/charts/BarChartBox";
+import PieChartBox from "../Component/charts/PieChartBox";
+import Loader from "../Component/Loader";
 function EmployeeDashboard() {
   const [monthlyTotals, setMonthlyTotals] = useState([]);
   const [categoryDistribution, setCategoryDistribution] = useState([]);
@@ -46,7 +34,7 @@ function EmployeeDashboard() {
     fetchData();
   }, [year, month]);
 
-  if (loading) return <CircularProgress />;
+  if (loading) return <Loader/>
 
   const totalBudget = budgetStatus?.overallBudget?.amount || 0;
   const totalSpent = budgetStatus?.totalSpent || 0;
@@ -108,110 +96,21 @@ function EmployeeDashboard() {
         </Grid>
 
         <Grid item xs={12}>
-          <Box display="flex" justifyContent="space-between" flexWrap="wrap">
-            {/* Bar Chart on the left */}
-            <Box sx={{ width: { xs: "100%", md: "45%" }, minHeight: 350 }}>
-              <Typography variant="subtitle1" gutterBottom color="#CBD5E1">
-                Monthly Expenses
-              </Typography>
-              <ResponsiveContainer height={300}>
-                <BarChart
-                  data={last6Months}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                  barCategoryGap={10}
-                >
-                  <XAxis
-                    dataKey="month"
-                    stroke="#CBD5E1"
-                    tick={{ fontSize: 12 }}
-                    angle={-40}
-                    textAnchor="end"
-                    interval={0}
-                  />
-                  <YAxis stroke="#CBD5E1" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#CBD5E1",
-                      color: "#1E293B",
-                    }}
-                    formatter={(value) => `₹${value.toFixed(2)}`}
-                  />
-                  <Bar
-                    dataKey="total"
-                    fill="#4F46E5"
-                    barSize={30}
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-
-          
-            <Box
-              sx={{
-                width: { xs: "100%", md: "45%" },
-                minHeight: 350,
-                marginLeft: { md: "auto" },
-                mt: { xs: 4, md: 0 },
-              }}
-            >
-              <Box
-                mb={2}
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Typography variant="subtitle1" color="#CBD5E1">
-                  Category-wise Expenses
-                </Typography>
-                <Box display="flex" gap={2} width={"200px"}>
-                  <Dropdown
-                    label="Year"
-                    name="year"
-                    value={year}
-                    onChange={setYear}
-                    options={yearOptions}
-                  />
-                  <Dropdown
-                    label="Month"
-                    name="month"
-                    value={month}
-                    onChange={setMonth}
-                    options={monthOptions}
-                  />
-                </Box>
-              </Box>
-              <ResponsiveContainer height={300}>
-                <PieChart>
-                  <Pie
-                    data={sortedCategories}
-                    dataKey="total"
-                    nameKey="category"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    label={({ category, total }) => `${category}: ₹${total}`}
-                  >
-                    {sortedCategories.map((_, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={PIE_COLORS[index % PIE_COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Legend wrapperStyle={{ color: "#CBD5E1" }} />
-                  <Tooltip
-                    formatter={(value, name) => [`₹${value.toFixed(2)}`, name]}
-                    contentStyle={{
-                      backgroundColor: "#3b82f6",
-                      color: "#F8FAFC",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </Box>
-          </Box>
-        </Grid>
+        <Box display="flex" justifyContent="space-between" flexWrap="wrap">
+          <BarChartBox data={last6Months} title="Monthly Expenses" />
+          <PieChartBox
+            data={categoryDistribution}
+            title="Category-wise Expenses"
+            year={year}
+            month={month}
+            onYearChange={setYear}
+            onMonthChange={setMonth}
+            yearOptions={yearOptions}
+            monthOptions={monthOptions}
+            DropdownComponent={Dropdown}
+          />
+        </Box>
+      </Grid>
       </Grid>
     </Box>
   );
