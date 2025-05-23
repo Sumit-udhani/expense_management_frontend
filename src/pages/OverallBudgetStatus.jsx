@@ -54,16 +54,20 @@ const OverallBudgetStatus = () => {
     <Box mt={3}>
       <Typography variant="h6">Overall Monthly Budget</Typography>
 
+      {!overallBudget &&(
 
-      <AuthButton
-        label={overallBudget ? "Edit Budget" : "Set Budget"}
-        onClick={() => setOpenBudgetModal(true)}
-      />
+        <AuthButton
+          label={!overallBudget && "Set Budget" }
+          onClick={() => setOpenBudgetModal(true)}
+        />
+      )}
       <SetBudgetForm
-        open={openBudgetModal}
-        handleClose={() => setOpenBudgetModal(false)}
-        onSuccess={fetchBudget}
-      />
+      open={openBudgetModal}
+      handleClose={() => setOpenBudgetModal(false)}
+      onSuccess={fetchBudget}
+      initialData={overallBudget} 
+    />
+    
 
       <Box display="flex" gap={2} mt={2} mb={2}>
         <Box flex={1}>
@@ -114,6 +118,11 @@ const OverallBudgetStatus = () => {
             <Typography color={isOver ? "error" : "text.secondary"}>
               Remaining: ₹{remaining.toFixed(2)} {isOver && "(Over budget)"}
             </Typography>
+            <AuthButton
+            label={overallBudget ? "Edit Budget" : "Set Budget"}
+            onClick={() => setOpenBudgetModal(true)}
+            size="small"
+          />
           </Paper>
         </>
       ) : (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Box, Grid, CircularProgress } from "@mui/material";
+import { Typography, Box, Grid } from "@mui/material";
 import api from "../api/axiosInterceptor";
 import Dropdown from "../Component/ReusableDropdown";
 import BarChartBox from "../Component/charts/BarChartBox";
@@ -34,15 +34,11 @@ function EmployeeDashboard() {
     fetchData();
   }, [year, month]);
 
-  if (loading) return <Loader/>
+  if (loading) return <Loader />
 
   const totalBudget = budgetStatus?.overallBudget?.amount || 0;
   const totalSpent = budgetStatus?.totalSpent || 0;
   const progress = ((totalSpent / totalBudget) * 100).toFixed(0);
-  const sortedCategories = [...categoryDistribution].sort(
-    (a, b) => b.total - a.total
-  );
-
   const yearOptions = [2023, 2024, 2025].map((y) => ({ label: y, value: y }));
   const monthOptions = Array.from({ length: 12 }, (_, i) => ({
     value: i + 1,
@@ -67,7 +63,7 @@ function EmployeeDashboard() {
       <Typography variant="h5" mb={3} color="#F8FAFC">
         Dashboard Insights
       </Typography>
-
+      
       <Grid container spacing={3} direction="column">
         <Grid item xs={12}>
           <Typography variant="subtitle1" color="#CBD5E1">
@@ -94,23 +90,22 @@ function EmployeeDashboard() {
             {totalSpent} / {totalBudget} (₹)
           </Typography>
         </Grid>
-
         <Grid item xs={12}>
-        <Box display="flex" justifyContent="space-between" flexWrap="wrap">
-          <BarChartBox data={last6Months} title="Monthly Expenses" />
-          <PieChartBox
-            data={categoryDistribution}
-            title="Category-wise Expenses"
-            year={year}
-            month={month}
-            onYearChange={setYear}
-            onMonthChange={setMonth}
-            yearOptions={yearOptions}
-            monthOptions={monthOptions}
-            DropdownComponent={Dropdown}
-          />
-        </Box>
-      </Grid>
+          <Box display="flex" justifyContent="space-between" flexWrap="wrap">
+            <BarChartBox data={last6Months} title="Monthly Expenses" />
+            <PieChartBox
+              data={categoryDistribution}
+              title="Category-wise Expenses"
+              year={year}
+              month={month}
+              onYearChange={setYear}
+              onMonthChange={setMonth}
+              yearOptions={yearOptions}
+              monthOptions={monthOptions}
+              DropdownComponent={Dropdown}
+            />
+          </Box>
+        </Grid>
       </Grid>
     </Box>
   );

@@ -5,56 +5,101 @@ import {
   Typography,
   IconButton,
   Box,
-  Avatar,
   Menu,
   MenuItem,
+  Avatar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useNavigate } from "react-router-dom";
-const Header = ({ title, onLogout, isMobile, onMenuClick,userRole }) => {
+
+const Header = ({
+  title,
+  onLogout,
+  userRole,
+  isSidebarOpen,
+  onMenuClick,
+  profile,
+}) => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
 
   const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
-  const navigate = useNavigate();
-
   const handleProfile = () => {
     handleMenuClose();
-    navigate("/welcome/profile")
+    navigate("/welcome/profile");
   };
+
+  const imageUrl = profile?.image
+    ? `http://localhost:8085/files/${encodeURIComponent(profile.image)}`
+    : null;
 
   return (
     <AppBar
       position="fixed"
       sx={{
-        zIndex: (theme) => theme.zIndex.drawer + 1,
+        zIndex: (theme) => theme.zIndex.appBar,
         backgroundColor: "background.paper",
         borderBottom: "1px solid",
         borderColor: "divider",
+        height: 64,
+        width: {
+          xs: "100%",
+          md: isSidebarOpen ? "calc(100% - 240px)" : "95%",
+        },
+        transition: "width 0.3s",
+        display: "flex",
+        alignItems: "center",
       }}
     >
-      <Toolbar sx={{ position: "relative", minHeight: 64 }}>
-        {isMobile && (
-          <IconButton color="inherit" edge="start" onClick={onMenuClick} sx={{ mr: 2 }}>
+      <Toolbar
+        sx={{
+          minHeight: 64,
+          px: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+      >
+        <Box sx={{ display: { xs: "block", md: "none" } }}>
+          <IconButton onClick={onMenuClick} color="inherit">
             <MenuIcon />
           </IconButton>
-        )}
+        </Box>
         <Typography
           variant="h6"
-          color="#F8FAFC"
-          sx={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}
+          color="white"
+          sx={{
+            flexGrow: 1,
+            textAlign: "center",
+            userSelect: "none",
+            display: { xs: "block", md: isSidebarOpen ? "none" : "block" },
+          }}
         >
           {title}
         </Typography>
-        <Box sx={{ marginLeft: "auto" }}>
-          <IconButton onClick={handleMenuOpen} size="large">
-            <AccountCircle sx={{ color: "#F8FAFC" }} />
+
+        <Box sx={{ ml: "auto" }}>
+          <IconButton
+            onClick={handleMenuOpen}
+            size="large"
+            aria-label="account"
+          >
+            <Avatar src={imageUrl} alt="Profile" sx={{ width: 36, height: 36 }}>
+              {!imageUrl && profile?.name
+                ? profile.name[0].toUpperCase()
+                : null}
+            </Avatar>
           </IconButton>
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-          {userRole !== "Admin" && (
-            <MenuItem onClick={handleProfile}>Profile</MenuItem>
-          )}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            {userRole !== "Admin" && (
+              <MenuItem onClick={handleProfile}>Profile</MenuItem>
+            )}
             <MenuItem onClick={onLogout}>Logout</MenuItem>
           </Menu>
         </Box>

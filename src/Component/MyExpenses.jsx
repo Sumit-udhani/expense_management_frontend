@@ -154,10 +154,16 @@ const MyExpenses = () => {
             setSelectedExpense(null);
           }}
           disabled={loading}
+          sx={{
+            alignSelf: isSmallScreen ? "flex-start" : "unset", 
+            width: isSmallScreen ? "auto" : "unset", 
+            px: 2,
+            py: 0.5,
+          }}
         />
       </Stack>
 
-      <Box mb={2}>
+      <Box mb={2} >
         <AuthButton
           label="Create Category"
           onClick={() => {
@@ -183,11 +189,7 @@ const MyExpenses = () => {
         />
       </Box>
 
-      {loading ? (
-       <Loader/>
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : expenses.length === 0 ? (
+      {expenses.length === 0 ? (
         <Typography mt={4} textAlign="center">
           No expenses found.
         </Typography>
@@ -252,6 +254,8 @@ const MyExpenses = () => {
               )}
               onSort={handleSort}
               sortConfig={sortConfig}
+              loading={loading}
+              error={error}
             />
           </Box>
 
@@ -294,6 +298,7 @@ const MyExpenses = () => {
           setSelectedExpense(null);
         }}
         title={selectedExpense ? "Edit Expense" : "Add Expense"}
+        maxWidth={900}
       >
         <AddExpenseForm
           initialData={selectedExpense}
@@ -311,16 +316,20 @@ const MyExpenses = () => {
       </ReusableModal>
 
       <ReusableModal
-        open={createCategoryModalOpen}
-        handleClose={() => setCreateCategoryModalOpen(false)}
-        title="Create Category"
-      >
+      open={createCategoryModalOpen}
+      handleClose={() => setCreateCategoryModalOpen(false)}
+      title="Create Category"
+      maxWidth={300}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <CreateCategory
           onCategoryCreated={() => {
             setCreateCategoryModalOpen(false);
           }}
         />
-      </ReusableModal>
+      </Box>
+    </ReusableModal>
+    
 
       <ReusableModal
         open={confirmDeleteModalOpen}
@@ -334,21 +343,20 @@ const MyExpenses = () => {
           Are you sure you want to delete this expense?
         </Typography>
         <Box display="flex" justifyContent="flex-end" gap={2}>
-        <AuthButton
-        label="Cancel"
-        color="primary"
-        variant="outlined"
-        onClick={() => setConfirmDeleteModalOpen(false)}
-        sx={{ px: 2, py: 0.6, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
-      />
-      <AuthButton
-        label="Delete"
-        color="error"
-        variant="outlined"
-        onClick={deleteExpense}
-        sx={{ px: 2, py: 0.6, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
-      />
-      
+          <AuthButton
+            label="Cancel"
+            color="primary"
+            variant="outlined"
+            onClick={() => setConfirmDeleteModalOpen(false)}
+            sx={{ px: 2, py: 0.6, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+          />
+          <AuthButton
+            label="Delete"
+            color="error"
+            variant="outlined"
+            onClick={deleteExpense}
+            sx={{ px: 2, py: 0.6, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
+          />
         </Box>
       </ReusableModal>
 
@@ -366,51 +374,76 @@ const MyExpenses = () => {
 
         {selectedExpense ? (
           <Box component={Paper} elevation={0}>
-            <Grid container spacing={2}>
-              {[
-                { label: "Title", value: selectedExpense.title },
-                { label: "Amount", value: `₹${selectedExpense.amount}` },
-                {
-                  label: "Category",
-                  value: selectedExpense.Category?.name || "N/A",
-                },
-                { label: "Status", value: selectedExpense.paymentStatus },
-                { label: "Payment Mode", value: selectedExpense.paymentMode },
-                {
-                  label: "Date",
-                  value: new Date(selectedExpense.date).toLocaleDateString(),
-                },
-              ].map(({ label, value }) => (
-                <Grid item xs={12} sm={6} md={4} key={label}>
-                  <Typography variant="caption" color="text.secondary">
-                    {label}
-                  </Typography>
-                  <Typography>{value}</Typography>
-                </Grid>
-              ))}
-            </Grid>
+          <Box
+          display="grid"
+          gridTemplateColumns="repeat(3, 1fr)"
+          gridTemplateRows="repeat(2, auto)"
+          gap={3}
+          mb={3}
+        >
+          <Box>
+            <Typography variant="caption" color="text.secondary">Title</Typography>
+            <Typography>{selectedExpense.title}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">Amount</Typography>
+            <Typography>₹{selectedExpense.amount}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">Category</Typography>
+            <Typography>{selectedExpense.Category?.name || "N/A"}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">Status</Typography>
+            <Typography>{selectedExpense.paymentStatus}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">Payment Mode</Typography>
+            <Typography>{selectedExpense.paymentMode}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">Date</Typography>
+            <Typography>{new Date(selectedExpense.date).toLocaleDateString()}</Typography>
+          </Box>
+        </Box>
+        
 
-            {selectedExpense.attachment && (
-              
-
-              <StyledBox>
-                <ImageIcon color="secondary" />
-                <Link
-                  href={`http://localhost:8085/${selectedExpense.attachment}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    wordBreak: "break-all",
-                    textDecoration: "none",
-                    color: "#f9fafb",
-                    textAlign: "center",
-                  }}
-                >
-                  Attachment
-                </Link>
-              </StyledBox>
-              
-            )}
+        {selectedExpense.attachment && (
+          <Box mt={2}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                borderRadius: "8px",
+                border: "1px solid",
+                backgroundColor: "transparent",
+                color: "#f9fafb",
+                width: "100%",
+                overflow: "hidden",
+                height: "90px",
+              }}
+            >
+              <ImageIcon color="secondary" />
+              <Link
+                href={`http://localhost:8085/${selectedExpense.attachment}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  wordBreak: "break-all",
+                  textDecoration: "none",
+                  color: "#f9fafb",
+                  textAlign: "center",
+                }}
+              >
+                Attachment
+              </Link>
+            </Paper>
+          </Box>
+        )}
+        
           </Box>
         ) : (
           <Typography>No data available.</Typography>

@@ -5,12 +5,14 @@ import api from '../api/axiosInterceptor';
 import AuthForm from './AuthForm';
 import ReusableModal from './ReusableModal';
 import { CircularProgress } from '@mui/material';
-const SetBudgetForm = ({ open, handleClose, onSuccess }) => {
+import Loader from './Loader';
+const SetBudgetForm = ({ open, handleClose, onSuccess,initialData }) => {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [categoryLoading, setCategoryLoading] = useState(true);
   const [msg,setMsg] = useState('')
+  const [amount, setAmount] = useState("");
   useEffect(() => {
     const fetchCategories = async () => {
       setMsg('Categories Loading')
@@ -24,8 +26,11 @@ const SetBudgetForm = ({ open, handleClose, onSuccess }) => {
         setCategoryLoading(false)
       }
     };
-    fetchCategories();
-  }, []);
+    if (open) {
+      
+      fetchCategories();
+    }
+  }, [open]);
   const monthOptions = Array.from({ length: 12 }, (_, i) => ({
     value: i + 1,
     label: new Date(0, i).toLocaleString('default', { month: 'long' }),
@@ -33,36 +38,30 @@ const SetBudgetForm = ({ open, handleClose, onSuccess }) => {
   
   const yearOptions = [2023, 2024, 2025].map(y => ({ label: y, value: y }));
   const formik = useFormik({
+    enableReinitialize: true, // ✅ allow reinitialization when initialData changes
     initialValues: {
-      amount: '',
-      categoryId: 'overall',
-      month: new Date().getMonth() + 1,
-      year: new Date().getFullYear(),
+      amount: initialData?.amount || '',
+      categoryId: 'overall', // or null if you want to reflect specific categories
+      month: initialData?.month || new Date().getMonth() + 1,
+      year: initialData?.year || new Date().getFullYear(),
     },
-    
-      
     validationSchema: Yup.object({
-        amount: Yup.number()
-          .required('Amount is required')
-          .positive('Amount must be positive'),
-        categoryId: Yup.mixed() 
-          .nullable()
-          .notRequired(),
-      }),
-      
+      amount: Yup.number()
+        .required('Amount is required')
+        .positive('Amount must be positive'),
+      categoryId: Yup.mixed().nullable().notRequired(),
+    }),
     onSubmit: async (values, { resetForm }) => {
       setIsLoading(true);
       setError('');
       try {
-        const now = new Date();
         await api.post('/budget', {
           ...values,
           categoryId: values.categoryId === 'overall' ? null : parseInt(values.categoryId),
-
           month: parseInt(values.month),
           year: parseInt(values.year),
         });
-
+  
         resetForm();
         onSuccess?.();
         handleClose();
@@ -74,6 +73,7 @@ const SetBudgetForm = ({ open, handleClose, onSuccess }) => {
       }
     },
   });
+  
   
   const fields = [
     {
@@ -110,16 +110,12 @@ const SetBudgetForm = ({ open, handleClose, onSuccess }) => {
     },
   ];
   
-  if (categoryLoading) {
-    return (
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-     
-        <CircularProgress />
-      </div>
-    );
-  }
+  
   return (
     <ReusableModal open={open} handleClose={handleClose} title="Set Monthly Budget">
+    {categoryLoading ? (
+      <Loader/>
+    ) : (
       <AuthForm
         formik={formik}
         fields={fields}
@@ -127,7 +123,8 @@ const SetBudgetForm = ({ open, handleClose, onSuccess }) => {
         isLoading={isLoading}
         error={error}
       />
-    </ReusableModal>
+    )}
+  </ReusableModal>
   );
 };
 

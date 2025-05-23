@@ -2,9 +2,10 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: auto; /* Prevent scrolling */
+  overflow-x: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
   font-family: 'Roboto', sans-serif;
   background-color: #0f172a;
-  color: #F8FAFC; /* Light background for contrast */
+  color: #F8FAFC;
 }
