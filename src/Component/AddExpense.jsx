@@ -34,8 +34,8 @@ const AddExpenseForm = ({ onSuccess, initialData }) => {
       title: initialData?.title || '',
       amount: initialData?.amount || '',
       categoryId: initialData?.categoryId || '',
-      paymentMode: initialData?.paymentMode || 'Cash',
-      paymentStatus: initialData?.paymentStatus || 'Pending',
+      paymentMode: initialData?.paymentMode || '',
+      paymentStatus: initialData?.paymentStatus || '',
       attachment: null,
       date: initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : '',
     },
@@ -121,13 +121,21 @@ const AddExpenseForm = ({ onSuccess, initialData }) => {
   }
   return (
     <AuthForm
-      formik={formik}
-      fields={fields}
-      buttonLabel={initialData ? 'Edit Expense' : 'Add Expense'}
-      isLoading={isLoading}
-      error={error}
-      sx={{ alignSelf: "flex-start" , minWidth: "150px", }}
-    />
+    formik={formik}
+    fields={fields}
+    buttonLabel={initialData ? 'Save' : 'Add Expense'}
+    isLoading={isLoading}
+    error={error}
+    customLayout={true}
+    fieldSpacingProps={{
+      rowGap: 0,
+      columnGap: 2
+    }}
+    fieldPropsOverride={(field) =>
+      field.type === 'file' ? { context: 'addExpense' } : {}
+    }
+  />
+  
   );
 };
 

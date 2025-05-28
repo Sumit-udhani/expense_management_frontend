@@ -54,7 +54,6 @@ const AppRoutes = ({ loggedIn, setLoggedIn }) => (
           <Route path="/welcome/profile" element={<ProfilePage />} />
         </Route>
 
-        {/* ✅ Protected Admin Routes */}
         <Route
           path="/admin"
           element={

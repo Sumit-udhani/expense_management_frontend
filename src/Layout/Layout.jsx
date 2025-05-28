@@ -14,13 +14,14 @@ const Layout = ({
   handleDrawerToggle,
   showTitleInSidebar,
   isSidebarOpen,
-  userProfile
+  userProfile,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", overflowX: "hidden" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+
       <Header
         title={title}
         onLogout={onLogout}
@@ -31,19 +32,31 @@ const Layout = ({
         isSidebarOpen={isSidebarOpen}
         profile={userProfile}
       />
-      <SidebarLayout
-        title={title}
-        menuItems={menuItems}
-        mobileOpen={mobileOpen}
-        handleDrawerToggle={handleDrawerToggle}
-        showTitleInSidebar={showTitleInSidebar}
-        isSidebarOpen={isSidebarOpen} // ✅ pass to sidebar too
-      >
-        <Box sx={{ flex: 1, overflowY: "hidden" }}>
-          {children}
-        </Box>
-        <Footer />
-      </SidebarLayout>
+      <Box sx={{ display: "flex", flex: 1 }}>
+        <SidebarLayout
+          title={title}
+          menuItems={menuItems}
+          mobileOpen={mobileOpen}
+          handleDrawerToggle={handleDrawerToggle}
+          showTitleInSidebar={showTitleInSidebar}
+          isSidebarOpen={isSidebarOpen}
+        >
+          <Box
+            sx={{
+              flexGrow: 1,
+              p: 2,
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+            }}
+          >
+            <Box sx={{ flex: 1 }}>{children}</Box>
+          </Box>
+        </SidebarLayout>
+      </Box>
+
+    
+      <Footer />
     </Box>
   );
 };

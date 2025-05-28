@@ -11,12 +11,22 @@ const ReusableTextField = ({
   size = "small",
   type = "text",
   sx = {},
-  fullWidth, // explicitly destructure so it's not in ...props
+  fullWidth,
+  context, 
   ...props
 }) => {
   if (type === "file") {
+    const isAddExpenseForm = context === 'addExpense';
     return (
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          width: fullWidth ? "100%" : "auto",
+          gap: 1,
+          ...sx,
+        }}
+      >
         <input
           type="file"
           accept="image/*"
@@ -24,7 +34,6 @@ const ReusableTextField = ({
           onChange={onChange}
           disabled={disabled}
           style={{ display: "none" }}
-          
         />
         <AuthButton
           label={value ? "Change Image" : "Choose Image"}
@@ -32,8 +41,28 @@ const ReusableTextField = ({
           variant="outlined"
           size={size}
           disabled={disabled}
+          fullWidth
+          sx={{
+            width: "100%",
+            ...(isAddExpenseForm && {
+              minHeight:
+                size === "large"
+                  ? "56px"
+                  : size === "medium"
+                  ? "40px"
+                  : "36px",
+            }),
+          }}
         />
-        <Box sx={{ fontSize: 14, color: "gray", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <Box
+          sx={{
+            fontSize: 14,
+            color: "gray",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
           {value?.name || ""}
         </Box>
       </Box>
@@ -52,7 +81,7 @@ const ReusableTextField = ({
       inputRef={inputRef}
       type={type}
       sx={sx}
-      fullWidth={fullWidth} // explicitly pass it here
+      fullWidth={fullWidth}
       {...props}
     />
   );

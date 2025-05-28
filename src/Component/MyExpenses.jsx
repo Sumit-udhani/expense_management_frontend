@@ -163,15 +163,7 @@ const MyExpenses = () => {
         />
       </Stack>
 
-      <Box mb={2} >
-        <AuthButton
-          label="Create Category"
-          onClick={() => {
-            setCreateCategoryModalOpen(true);
-            setSelectedExpense(null);
-          }}
-        />
-      </Box>
+     
 
       <Box display="flex" justifyContent="flex-end" mb={2}>
         <ReusableTextField
@@ -298,7 +290,7 @@ const MyExpenses = () => {
           setSelectedExpense(null);
         }}
         title={selectedExpense ? "Edit Expense" : "Add Expense"}
-        maxWidth={900}
+        maxWidth={550}
       >
         <AddExpenseForm
           initialData={selectedExpense}
@@ -315,20 +307,7 @@ const MyExpenses = () => {
         />
       </ReusableModal>
 
-      <ReusableModal
-      open={createCategoryModalOpen}
-      handleClose={() => setCreateCategoryModalOpen(false)}
-      title="Create Category"
-      maxWidth={300}
-    >
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <CreateCategory
-          onCategoryCreated={() => {
-            setCreateCategoryModalOpen(false);
-          }}
-        />
-      </Box>
-    </ReusableModal>
+   
     
 
       <ReusableModal
@@ -338,6 +317,7 @@ const MyExpenses = () => {
           setExpenseToDelete(null);
         }}
         title="Confirm Deletion"
+        maxWidth={400}
       >
         <Typography mb={2}>
           Are you sure you want to delete this expense?
@@ -361,94 +341,105 @@ const MyExpenses = () => {
       </ReusableModal>
 
       <ReusableModal
-        open={viewModalOpen}
-        handleClose={() => {
-          setViewModalOpen(false);
-          setSelectedExpense(null);
-        }}
-        title="Expense Details"
-        maxWidth="md"
-        fullWidth
-      >
-        <Divider sx={{ my: 1, borderColor: "#3b82f6" }} />
-
-        {selectedExpense ? (
-          <Box component={Paper} elevation={0}>
+      open={viewModalOpen}
+      handleClose={() => {
+        setViewModalOpen(false);
+        setSelectedExpense(null);
+      }}
+      title="Expense Details"
+      maxWidth="400px"
+     
+    >
+      <Divider sx={{ my: 1, borderColor: "#3b82f6" }} />
+    
+      {selectedExpense ? (
+        <Box component={Paper} elevation={0} sx={{ p: 2,width:'350px' }}>
           <Box
-          display="grid"
-          gridTemplateColumns="repeat(3, 1fr)"
-          gridTemplateRows="repeat(2, auto)"
-          gap={3}
-          mb={3}
-        >
-          <Box>
-            <Typography variant="caption" color="text.secondary">Title</Typography>
-            <Typography>{selectedExpense.title}</Typography>
+            display="grid"
+            gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr", md: "repeat(3, 1fr)" }}
+            gap={2} 
+            mb={2} 
+          >
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Title
+              </Typography>
+              <Typography>{selectedExpense.title}</Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Amount
+              </Typography>
+              <Typography>₹{selectedExpense.amount}</Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Category
+              </Typography>
+              <Typography>{selectedExpense.Category?.name || "N/A"}</Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Status
+              </Typography>
+              <Typography>{selectedExpense.paymentStatus}</Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Payment Mode
+              </Typography>
+              <Typography>{selectedExpense.paymentMode}</Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Date
+              </Typography>
+              <Typography>
+                {new Date(selectedExpense.date).toLocaleDateString()}
+              </Typography>
+            </Box>
           </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">Amount</Typography>
-            <Typography>₹{selectedExpense.amount}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">Category</Typography>
-            <Typography>{selectedExpense.Category?.name || "N/A"}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">Status</Typography>
-            <Typography>{selectedExpense.paymentStatus}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">Payment Mode</Typography>
-            <Typography>{selectedExpense.paymentMode}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">Date</Typography>
-            <Typography>{new Date(selectedExpense.date).toLocaleDateString()}</Typography>
-          </Box>
-        </Box>
-        
-
-        {selectedExpense.attachment && (
-          <Box mt={2}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 3,
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                borderRadius: "8px",
-                border: "1px solid",
-                backgroundColor: "transparent",
-                color: "#f9fafb",
-                width: "100%",
-                overflow: "hidden",
-                height: "90px",
-              }}
-            >
-              <ImageIcon color="secondary" />
-              <Link
-                href={`http://localhost:8085/${selectedExpense.attachment}`}
-                target="_blank"
-                rel="noopener noreferrer"
+    
+          {selectedExpense.attachment && (
+            <Box mt={2}>
+              <Paper
+                elevation={1}
                 sx={{
-                  wordBreak: "break-all",
-                  textDecoration: "none",
+                  p: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  borderRadius: "6px",
+                  border: "1px solid",
+                  backgroundColor: "transparent",
                   color: "#f9fafb",
-                  textAlign: "center",
+                  overflow: "hidden",
+                  height: "70px", // reduced height
+                  width:"300px"
                 }}
               >
-                Attachment
-              </Link>
-            </Paper>
-          </Box>
-        )}
-        
-          </Box>
-        ) : (
-          <Typography>No data available.</Typography>
-        )}
-      </ReusableModal>
+                <ImageIcon color="secondary" />
+                <Link
+                  href={`http://localhost:8085/${selectedExpense.attachment}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    wordBreak: "break-all",
+                    textDecoration: "none",
+                    color: "#f9fafb",
+                  }}
+                >
+                  Attachment
+                </Link>
+              </Paper>
+            </Box>
+          )}
+        </Box>
+      ) : (
+        <Typography>No data available.</Typography>
+      )}
+    </ReusableModal>
+    
     </Box>
   );
 };

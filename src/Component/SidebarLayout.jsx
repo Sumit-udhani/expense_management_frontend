@@ -14,6 +14,7 @@ import {
   useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from '@mui/icons-material/Close';
 const SidebarLayout = ({
   title,
   menuItems,
@@ -43,9 +44,17 @@ const SidebarLayout = ({
             {title}
           </Typography>
         )}
-        <IconButton onClick={handleDrawerToggle}>
-          <MenuIcon />
+        {!isMobile &&(
+
+          <IconButton onClick={handleDrawerToggle}>
+            <MenuIcon />
+          </IconButton>
+        )}
+        {isMobile &&(
+          <IconButton onClick={handleDrawerToggle}>
+          <CloseIcon/>
         </IconButton>
+        )}
       </Box>
 
       <Divider sx={{ borderColor: "divider" }} />
@@ -65,13 +74,14 @@ const SidebarLayout = ({
   );
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: "background.default" }}>
+    <Box sx={{ display: "flex", flex: 1, minHeight: 0, backgroundColor: "background.default" }}>
+ 
       <Box
         component="nav"
         sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
         aria-label="sidebar"
       >
-        {/* Mobile drawer */}
+
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -90,8 +100,8 @@ const SidebarLayout = ({
         >
           {drawerContent}
         </Drawer>
-
-        {/* Permanent desktop drawer */}
+  
+        
         <Drawer
           variant="permanent"
           open
@@ -112,21 +122,26 @@ const SidebarLayout = ({
           {drawerContent}
         </Drawer>
       </Box>
-
-      {/* Main content */}
+ 
       <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          mt: 8,
-          width: { xs: "100%", md: `calc(100% - ${drawerWidth}px)` },
-          transition: "width 0.3s",
-        }}
-      >
+      component="main"
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        mt:8, 
+        minHeight: 0, 
+      }}
+    >
+      <Box sx={{ flexGrow: 1 }}>
         {children}
       </Box>
     </Box>
+    
+    </Box>
   );
+  
 };
 export default SidebarLayout

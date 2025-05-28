@@ -1,54 +1,40 @@
-import { Box } from "@mui/material";
-import { useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import AuthForm from "./AuthForm";
 import api from "../api/axiosInterceptor";
-import ReusableTextField from "./ReusableTextfield";
-import AuthButton from "./AuthButton";
-
 const CreateCategory = ({ onCategoryCreated }) => {
-  const [name, setName] = useState("");
+  const formik = useFormik({
+    initialValues: { name: "" },
+    validationSchema: Yup.object({
+      name: Yup.string().required("Category name is required"),
+    }),
+    onSubmit: async (values, { resetForm, setSubmitting }) => {
+      try {
+        await api.post("/category", { name: values.name });
+        onCategoryCreated();
+        resetForm();
+      } catch (error) {
+        console.error("Error creating category:", error);
+      }
+      setSubmitting(false);
+    },
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!name) return;
-
-    try {
-      await api.post("/category", { name });
-      onCategoryCreated();
-      setName("");
-    } catch (error) {
-      console.error("Error creating category:", error);
-    }
-  };
+  const fields = [
+    {
+      name: "name",
+      label: "Category Name",
+      type: "text",
+    },
+  ];
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit}
-      display="flex"
-      flexDirection="column"
-      gap={2}
-      mt={1}
-      width="250px" 
-    >
-      <Box>
-        <ReusableTextField
-          label="Category Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          size="small"
-          variant="filled"
-          fullWidth 
-        />
-      </Box>
-
-      <AuthButton
-        label="Create"
-        type="submit"
-        size="small"
-        sx={{ alignSelf: "flex-start" , minWidth: "150px", }}
-      />
-    </Box>
+    <AuthForm
+      fields={fields}
+      formik={formik}
+      buttonLabel="Create"
+      isLoading={formik.isSubmitting}
+    />
   );
 };
-
-export default CreateCategory;
+export default CreateCategory

@@ -6,7 +6,7 @@ import {
   Link,
   Paper,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import api from "../api/axiosInterceptor";
 import ReusableTable from "../Component/ReusableTable";
@@ -28,7 +28,7 @@ const UserDetailsPage = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
+  const navigate = useNavigate()
   useEffect(() => {
     fetchData();
   }, [id, page, search, sortConfig]);
@@ -48,8 +48,13 @@ const UserDetailsPage = () => {
         api.get(`/auth/me`, { params: { id } }),
       ]);
 
-      setExpenses(expensesRes.data.data);
-      setTotalPages(expensesRes.data.totalPages);
+      const fetchedExpenses = expensesRes.data.data;
+      const fetchedTotalPages = expensesRes.data.totalPages;
+      
+      setExpenses(fetchedExpenses);
+      setTotalPages(fetchedTotalPages > 0 ? fetchedTotalPages : 1);
+      if (fetchedTotalPages === 0) setPage(1); // optional: reset to 1 if no data
+      
       setProfile(profileRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -92,6 +97,13 @@ const UserDetailsPage = () => {
 
   return (
     <Box p={3}>
+    <Box>
+      <AuthButton 
+      label={"Back"}
+      onClick={()=> navigate('/admin/dashboard')}
+      variant="outlined"
+      />
+      </Box>
       <UserProfileCard
         profile={transformedProfile}
         onImageUpload={() => {}}
@@ -146,6 +158,7 @@ const UserDetailsPage = () => {
           disabled={page === 1 || loading}
         />
         <Typography>
+      
           Page {page} of {totalPages}
         </Typography>
         <AuthButton
@@ -163,6 +176,7 @@ const UserDetailsPage = () => {
           setSelectedExpense(null);
         }}
         title="Expense Details"
+        maxWidth="400px"
       >
         <Divider sx={{ my: 1, borderColor: "#3b82f6" }} />
         {selectedExpense ? (
@@ -229,7 +243,8 @@ const UserDetailsPage = () => {
                     color: "#f9fafb",
                     width: "100%",
                     overflow: "hidden",
-                    height: "90px",
+                    height: "70px",
+                    width:"300px"
                   }}
                 >
                   <ImageIcon color="secondary" />

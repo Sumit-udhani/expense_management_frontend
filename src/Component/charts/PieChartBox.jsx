@@ -22,7 +22,10 @@ const PieChartBox = ({
   monthOptions = [],
   DropdownComponent,
 }) => {
-  const sortedData = [...data].sort((a, b) => b.total - a.total);
+  const sortedData = [...data]
+  .filter((item) => item.total > 0) 
+  .sort((a, b) => b.total - a.total);
+
 
   return (
     <Box

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Box,
   Typography,
@@ -7,7 +7,9 @@ import {
   Avatar,
   useMediaQuery,
   useTheme,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import ReusableTextField from "./ReusableTextfield";
 import AuthButton from "./AuthButton";
 import ReusableModal from "./ReusableModal";
@@ -25,6 +27,7 @@ const UserProfileCard = ({
   setEditOpen,
 }) => {
   const fileInputRef = useRef(null);
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const role = localStorage.getItem("role");
 
   const imageUrl = profile.image
@@ -52,7 +55,12 @@ const UserProfileCard = ({
       <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 } }}>
         <Stack spacing={2} alignItems="flex-start">
           <Stack direction="row" spacing={2} alignItems="center">
-            <Avatar src={imageUrl} alt="Profile" sx={{ width: 80, height: 80 }}>
+            <Avatar
+              src={imageUrl}
+              alt="Profile"
+              sx={{ width: 80, height: 80, cursor: imageUrl ? "pointer" : "default" }}
+              onClick={() => imageUrl && setAvatarModalOpen(true)}
+            >
               {!profile.image && profile.name
                 ? profile.name[0].toUpperCase()
                 : null}
@@ -63,10 +71,29 @@ const UserProfileCard = ({
                   type="file"
                   inputRef={fileInputRef}
                   onChange={(e) => setSelectedFile(e.target.files[0])}
-                  value={selectedFile}
                   disabled={loading}
                   fullWidth
                 />
+            
+                {selectedFile && (
+                  <Box display="flex" alignItems="center">
+                    <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+                      Selected file: {selectedFile.name}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = null;
+                        }
+                      }}
+                    >
+                      <CloseIcon  color="error" />
+                    </IconButton>
+                  </Box>
+                )}
+            
                 <AuthButton
                   label="Upload Image"
                   onClick={onImageUpload}
@@ -75,6 +102,7 @@ const UserProfileCard = ({
                 />
               </Box>
             )}
+            
           </Stack>
 
           <Box>
@@ -108,10 +136,16 @@ const UserProfileCard = ({
         </Stack>
       </Paper>
 
+  
       {role !== "Admin" && (
         <ReusableModal
           open={editOpen}
-          handleClose={() => setEditOpen(false)}
+          handleClose={() => {
+            setEditOpen(false);
+            if (formik) {
+              formik.resetForm();
+            }
+          }}
           title="Edit Profile"
           maxWidth={400}
         >
@@ -125,6 +159,28 @@ const UserProfileCard = ({
               autoComplete="off"
             />
           )}
+        </ReusableModal>
+      )}
+
+     
+      {imageUrl && (
+        <ReusableModal
+          open={avatarModalOpen}
+          handleClose={() => setAvatarModalOpen(false)}
+          title="Profile Picture"
+          maxWidth={600}
+        >
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <img
+              src={imageUrl}
+              alt="Full Profile"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "80vh",
+                borderRadius: "10px",
+              }}
+            />
+          </Box>
         </ReusableModal>
       )}
     </Box>

@@ -39,7 +39,7 @@ const LayoutWrapper = ({ setLoggedIn }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res =  await api.get(`/auth/me`, { params: { id } })
+        const res =  await api.get(`/auth/me`)
         const user = res.data;
         setUserProfile({
           name: user.name || "",
@@ -53,7 +53,7 @@ const LayoutWrapper = ({ setLoggedIn }) => {
     };
 
     fetchProfile();
-  }, [id]);
+  }, []);
 
   return (
     <Layout
