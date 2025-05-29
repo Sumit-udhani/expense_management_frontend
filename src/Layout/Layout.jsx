@@ -21,7 +21,7 @@ const Layout = ({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-
+      {/* HEADER */}
       <Header
         title={title}
         onLogout={onLogout}
@@ -32,7 +32,9 @@ const Layout = ({
         isSidebarOpen={isSidebarOpen}
         profile={userProfile}
       />
-      <Box sx={{ display: "flex", flex: 1 }}>
+
+      {/* MAIN CONTENT WRAPPER */}
+      <Box sx={{ display: "flex", flex: 1, overflow: "hidden" }}>
         <SidebarLayout
           title={title}
           menuItems={menuItems}
@@ -43,19 +45,18 @@ const Layout = ({
         >
           <Box
             sx={{
-              flexGrow: 1,
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
               flex: 1,
+              overflowY: "auto",
+              p: 2,
+              minHeight: 0, 
             }}
           >
-            <Box sx={{ flex: 1 }}>{children}</Box>
+            {children}
           </Box>
         </SidebarLayout>
       </Box>
 
-    
+     
       <Footer />
     </Box>
   );

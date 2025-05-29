@@ -58,6 +58,7 @@ const SetBudgetForm = ({ open, handleClose, onSuccess, initialData, overallBudge
       if (isCategoryBudget && overallAmount && budgetAmount > overallAmount) {
         setError('Category budget cannot be greater than overall budget');
         setIsLoading(false);
+ 
         return;
       }
 
@@ -74,7 +75,7 @@ const SetBudgetForm = ({ open, handleClose, onSuccess, initialData, overallBudge
         handleClose();
       } catch (err) {
         console.error('Error setting budget:', err);
-        setError('Failed to set budget');
+        setError('Category budget cannot be greater than overall budget');
       } finally {
         setIsLoading(false);
       }
@@ -129,7 +130,13 @@ const SetBudgetForm = ({ open, handleClose, onSuccess, initialData, overallBudge
       type: 'number',
     },
   ];
-
+  useEffect(() => {
+    if (!open) {
+      setError('');
+      formik.resetForm();
+    }
+  }, [open]);
+  
   return (
     <ReusableModal open={open} handleClose={handleClose} title="Set Monthly Budget" maxWidth={350}>
       {categoryLoading ? (

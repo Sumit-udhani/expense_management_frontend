@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import ReusableTextField from "./ReusableTextfield";
 import Dropdown from "./ReusableDropdown";
-import AuthButton from "./AuthButton";
 import {
   Box,
   TextField,

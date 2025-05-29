@@ -11,10 +11,9 @@ function WelcomeAdmin() {
       justifyContent: 'center',
       flexGrow: 1,
       px: 2,
-      color: 'text.primary',
     }}
   >
-    <Typography variant="h4" sx={{ mb: 2, textAlign: 'center' }}>
+    <Typography variant="h4" sx={{mb:'2', textAlign: 'center' }}>
       Welcome on Admin Dashboard
     </Typography>
   </Box>

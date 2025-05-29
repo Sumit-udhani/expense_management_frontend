@@ -41,11 +41,11 @@ const UserProfileCard = ({
     <Box
       sx={{
         p: { xs: 2, sm: 3, md: 4 },
-        maxWidth: { xs: "100%", sm: 500, md: 600 },
+        maxWidth: { xs: "100%", sm: 500, md: 500 },
         mx: role === "Admin" ? 0 : "auto",
-        flexGrow: 1,
-        overflowY: "auto",
-        minHeight: 0,
+        width: "100%",
+        height: "auto",
+        overflow: "hidden",
       }}
     >
       <Typography variant="h5" mb={2}>
@@ -58,7 +58,11 @@ const UserProfileCard = ({
             <Avatar
               src={imageUrl}
               alt="Profile"
-              sx={{ width: 80, height: 80, cursor: imageUrl ? "pointer" : "default" }}
+              sx={{
+                width: 80,
+                height: 80,
+                cursor: imageUrl ? "pointer" : "default",
+              }}
               onClick={() => imageUrl && setAvatarModalOpen(true)}
             >
               {!profile.image && profile.name
@@ -74,10 +78,14 @@ const UserProfileCard = ({
                   disabled={loading}
                   fullWidth
                 />
-            
+
                 {selectedFile && (
                   <Box display="flex" alignItems="center">
-                    <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mr: 1 }}
+                    >
                       Selected file: {selectedFile.name}
                     </Typography>
                     <IconButton
@@ -89,11 +97,11 @@ const UserProfileCard = ({
                         }
                       }}
                     >
-                      <CloseIcon  color="error" />
+                      <CloseIcon color="error" />
                     </IconButton>
                   </Box>
                 )}
-            
+
                 <AuthButton
                   label="Upload Image"
                   onClick={onImageUpload}
@@ -102,7 +110,6 @@ const UserProfileCard = ({
                 />
               </Box>
             )}
-            
           </Stack>
 
           <Box>
@@ -136,7 +143,6 @@ const UserProfileCard = ({
         </Stack>
       </Paper>
 
-  
       {role !== "Admin" && (
         <ReusableModal
           open={editOpen}
@@ -162,7 +168,6 @@ const UserProfileCard = ({
         </ReusableModal>
       )}
 
-     
       {imageUrl && (
         <ReusableModal
           open={avatarModalOpen}
