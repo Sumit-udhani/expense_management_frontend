@@ -10,6 +10,7 @@ import {
   Grid,
   Stack,
   useTheme,
+  IconButton,
 } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
 import api from "../api/axiosInterceptor";
@@ -22,6 +23,9 @@ import debounce from "lodash.debounce";
 import CreateCategory from "./CategoryForm";
 import Loader from "./Loader";
 import StyledBox from "./StyledBox";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 const MyExpenses = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
@@ -155,15 +159,13 @@ const MyExpenses = () => {
           }}
           disabled={loading}
           sx={{
-            alignSelf: isSmallScreen ? "flex-start" : "unset", 
-            width: isSmallScreen ? "auto" : "unset", 
+            alignSelf: isSmallScreen ? "flex-start" : "unset",
+            width: isSmallScreen ? "auto" : "unset",
             px: 2,
             py: 0.5,
           }}
         />
       </Stack>
-
-     
 
       <Box display="flex" justifyContent="flex-end" mb={2}>
         <ReusableTextField
@@ -194,54 +196,35 @@ const MyExpenses = () => {
               getRowData={getRowData}
               actions={(expense) => (
                 <Box display="flex" flexWrap="wrap" gap={1}>
-                  <AuthButton
-                    label="Edit"
-                    color="primary"
-                    onClick={() => {
-                      setSelectedExpense(expense);
-                      setOpenModal(true);
-                    }}
-                    variant="outlined"
-                    disabled={loading}
-                    sx={{
-                      py: 0.5,
-                      px: 1.5,
-                      minWidth: "auto",
-                      fontSize: "0.75rem",
-                    }}
-                  />
-                  <AuthButton
-                    label="Delete"
-                    color="error"
+                 
+                 <IconButton
+                  size="small"
+                  onClick={() => {
+                    setSelectedExpense(expense);
+                    setOpenModal(true);
+                  }}
+                  >
+                    <EditOutlinedIcon color="primary"/>
+                 </IconButton>
+                  <IconButton
+                    size="small"
                     onClick={() => {
                       setExpenseToDelete(expense.id);
                       setConfirmDeleteModalOpen(true);
                     }}
-                    variant="outlined"
-                    disabled={loading}
-                    sx={{
-                      py: 0.5,
-                      px: 1.5,
-                      minWidth: "auto",
-                      fontSize: "0.75rem",
-                    }}
-                  />
-                  <AuthButton
-                    label="View"
-                    color="info"
-                    onClick={() => {
-                      setSelectedExpense(expense);
-                      setViewModalOpen(true);
-                    }}
-                    variant="outlined"
-                    disabled={loading}
-                    sx={{
-                      py: 0.5,
-                      px: 1.5,
-                      minWidth: "auto",
-                      fontSize: "0.75rem",
-                    }}
-                  />
+                  >
+                    <DeleteOutlineOutlinedIcon color="error" />
+                  </IconButton>
+                  <IconButton
+                  size="small"
+                  onClick={() => {
+                    setSelectedExpense(expense);
+                    setViewModalOpen(true);
+                  }}
+                  >
+                    <VisibilityOutlinedIcon color="info"/>
+                  </IconButton>
+                 
                 </Box>
               )}
               onSort={handleSort}
@@ -307,9 +290,6 @@ const MyExpenses = () => {
         />
       </ReusableModal>
 
-   
-    
-
       <ReusableModal
         open={confirmDeleteModalOpen}
         handleClose={() => {
@@ -341,105 +321,109 @@ const MyExpenses = () => {
       </ReusableModal>
 
       <ReusableModal
-      open={viewModalOpen}
-      handleClose={() => {
-        setViewModalOpen(false);
-        setSelectedExpense(null);
-      }}
-      title="Expense Details"
-      maxWidth="400px"
-     
-    >
-      <Divider sx={{ my: 1, borderColor: "#3b82f6" }} />
-    
-      {selectedExpense ? (
-        <Box component={Paper} elevation={0} sx={{ p: 2,width:'350px' }}>
-          <Box
-            display="grid"
-            gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr", md: "repeat(3, 1fr)" }}
-            gap={2} 
-            mb={2} 
-          >
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Title
-              </Typography>
-              <Typography>{selectedExpense.title}</Typography>
+        open={viewModalOpen}
+        handleClose={() => {
+          setViewModalOpen(false);
+          setSelectedExpense(null);
+        }}
+        title="Expense Details"
+        maxWidth="400px"
+      >
+        <Divider sx={{ my: 1, borderColor: "#3b82f6" }} />
+
+        {selectedExpense ? (
+          <Box component={Paper} elevation={0} sx={{ p: 2, width: "350px" }}>
+            <Box
+              display="grid"
+              gridTemplateColumns={{
+                xs: "1fr",
+                sm: "1fr 1fr",
+                md: "repeat(3, 1fr)",
+              }}
+              gap={2}
+              mb={2}
+            >
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Title
+                </Typography>
+                <Typography>{selectedExpense.title}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Amount
+                </Typography>
+                <Typography>₹{selectedExpense.amount}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Category
+                </Typography>
+                <Typography>
+                  {selectedExpense.Category?.name || "N/A"}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Status
+                </Typography>
+                <Typography>{selectedExpense.paymentStatus}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Payment Mode
+                </Typography>
+                <Typography>{selectedExpense.paymentMode}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Date
+                </Typography>
+                <Typography>
+                  {new Date(selectedExpense.date).toLocaleDateString()}
+                </Typography>
+              </Box>
             </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Amount
-              </Typography>
-              <Typography>₹{selectedExpense.amount}</Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Category
-              </Typography>
-              <Typography>{selectedExpense.Category?.name || "N/A"}</Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Status
-              </Typography>
-              <Typography>{selectedExpense.paymentStatus}</Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Payment Mode
-              </Typography>
-              <Typography>{selectedExpense.paymentMode}</Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Date
-              </Typography>
-              <Typography>
-                {new Date(selectedExpense.date).toLocaleDateString()}
-              </Typography>
-            </Box>
-          </Box>
-    
-          {selectedExpense.attachment && (
-            <Box mt={2}>
-              <Paper
-                elevation={1}
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  borderRadius: "6px",
-                  border: "1px solid",
-                  backgroundColor: "transparent",
-                  color: "#f9fafb",
-                  overflow: "hidden",
-                  height: "70px", // reduced height
-                  width:"300px"
-                }}
-              >
-                <ImageIcon color="secondary" />
-                <Link
-                  href={`http://localhost:8085/${selectedExpense.attachment}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+
+            {selectedExpense.attachment && (
+              <Box mt={2}>
+                <Paper
+                  elevation={1}
                   sx={{
-                    wordBreak: "break-all",
-                    textDecoration: "none",
+                    p: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    borderRadius: "6px",
+                    border: "1px solid",
+                    backgroundColor: "transparent",
                     color: "#f9fafb",
+                    overflow: "hidden",
+                    height: "70px", // reduced height
+                    width: "300px",
                   }}
                 >
-                  Attachment
-                </Link>
-              </Paper>
-            </Box>
-          )}
-        </Box>
-      ) : (
-        <Typography>No data available.</Typography>
-      )}
-    </ReusableModal>
-    
+                  <ImageIcon color="secondary" />
+                  <Link
+                    href={`http://localhost:8085/${selectedExpense.attachment}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      wordBreak: "break-all",
+                      textDecoration: "none",
+                      color: "#f9fafb",
+                    }}
+                  >
+                    Attachment
+                  </Link>
+                </Paper>
+              </Box>
+            )}
+          </Box>
+        ) : (
+          <Typography>No data available.</Typography>
+        )}
+      </ReusableModal>
     </Box>
   );
 };
