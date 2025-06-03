@@ -22,7 +22,7 @@ const OverallBudgetStatus = ({ formik }) => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [openBudgetModal, setOpenBudgetModal] = useState(null);
   const [categoryDistribution, setCategoryDistribution] = useState([]);
-  const [createCategoryModalOpen, setCreateCategoryModalOpen] = useState(false); // ✅ Added state
+  const [createCategoryModalOpen, setCreateCategoryModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
 
   const fetchBudget = async () => {
@@ -33,7 +33,9 @@ const OverallBudgetStatus = ({ formik }) => {
         api.get(`/budget/category-distribution?month=${month}&year=${year}`),
       ]);
 
-      const { overallBudget, totalSpent } = budgetRes.data;
+      const { overallBudget } = budgetRes.data;
+      const totalSpent = overallBudget?.spent || 0;
+      
       setOverallBudget(overallBudget);
       setTotalSpent(totalSpent);
       setCategoryDistribution(categoryRes.data);
@@ -49,14 +51,15 @@ const OverallBudgetStatus = ({ formik }) => {
     fetchBudget();
   }, [month, year]);
 
-  const remaining = Number(overallBudget?.amount || 0) - totalSpent;
+  const safeTotalSpent = Number(totalSpent) || 0;
+  const remaining = Number(overallBudget?.amount || 0) - safeTotalSpent;
   const isOver = remaining < 0;
+  
 
   if (loading) return <Loader />;
   if (error) return <Typography color="error">{error}</Typography>;
-  const visibleCategories = categoryDistribution.filter(
-    (cat) => cat.budget || cat.total > 0
-  );
+  const hasAnyCategory = categoryDistribution.length > 0;
+
   return (
     <Box mt={3}>
       <Typography variant="h6">Overall Monthly Budget</Typography>
@@ -156,10 +159,10 @@ const OverallBudgetStatus = ({ formik }) => {
             <Typography>
               Budget: ₹{Number(overallBudget.amount).toFixed(2)}
             </Typography>
-            <Typography>Spent: ₹{totalSpent.toFixed(2)}</Typography>
+            <Typography>Spent: ₹{safeTotalSpent.toFixed(2)}</Typography>
             <Typography color={isOver ? "error" : "text.secondary"}>
-              Remaining: ₹{remaining.toFixed(2)} {isOver && "(Over budget)"}
-            </Typography>
+            Remaining: ₹{remaining.toFixed(2)} {isOver && "(Over budget)"}
+          </Typography>
             <AuthButton
               label="Edit Budget"
               onClick={() =>
@@ -176,17 +179,17 @@ const OverallBudgetStatus = ({ formik }) => {
         <Typography>No overall budget set yet</Typography>
       )}
 
-      {visibleCategories .length > 0 ? (
+      {hasAnyCategory ? (
         <Box mt={4}>
           <Typography variant="h6" gutterBottom>
             Category-wise Budget Status
           </Typography>
-
+      
           <Box display="flex" flexWrap="wrap" gap={2}>
             {categoryDistribution.map((cat) => {
               const remaining = Number(cat.budget || 0) - Number(cat.total || 0);
               const isOver = remaining < 0;
-
+      
               return (
                 <Paper
                   key={cat.categoryId}
@@ -225,11 +228,13 @@ const OverallBudgetStatus = ({ formik }) => {
             })}
           </Box>
         </Box>
-      ):(
+      ) : (
         <Box mt={1}>
-        <Typography>No Category budget set yet</Typography>
+          <Typography>No categories found. Create one to set a budget.</Typography>
         </Box>
       )}
+      
+      
     </Box>
   );
 };

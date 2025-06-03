@@ -1,8 +1,13 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import AuthForm from "./AuthForm";
-import api from "../api/axiosInterceptor";
-const CreateCategory = ({ onCategoryCreated }) => {
+import { useDispatch, useSelector } from "react-redux";
+import { addCategories } from "../store/features/categorySlice";
+
+const CreateCategory = () => {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.categories);
+
   const formik = useFormik({
     initialValues: { name: "" },
     validationSchema: Yup.object({
@@ -10,13 +15,13 @@ const CreateCategory = ({ onCategoryCreated }) => {
     }),
     onSubmit: async (values, { resetForm, setSubmitting }) => {
       try {
-        await api.post("/category", { name: values.name });
-        onCategoryCreated();
+        await dispatch(addCategories({ name: values.name })).unwrap();
         resetForm();
       } catch (error) {
         console.error("Error creating category:", error);
+      } finally {
+        setSubmitting(false);
       }
-      setSubmitting(false);
     },
   });
 
@@ -33,8 +38,9 @@ const CreateCategory = ({ onCategoryCreated }) => {
       fields={fields}
       formik={formik}
       buttonLabel="Create"
-      isLoading={formik.isSubmitting}
+      isLoading={loading || formik.isSubmitting}
     />
   );
 };
-export default CreateCategory
+
+export default CreateCategory;

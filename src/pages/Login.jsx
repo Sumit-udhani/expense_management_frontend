@@ -10,9 +10,11 @@ import * as Yup from 'yup';
 import AuthFormWrapper from '../Component/AuthFormWrapper';
 import AuthForm from '../Component/AuthForm';
 import api from '../api/axiosInterceptor';
-
-const Login = ({ setLoggedIn }) => {
+import { useDispatch } from 'react-redux';
+import {loginSuccess,} from'../store/features/auth/authSlice';
+const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
@@ -32,10 +34,11 @@ const Login = ({ setLoggedIn }) => {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const response = await api.post('/auth/login', values);
-        const { token, role } = response.data;
+        const { token, role,user } = response.data;
 
         localStorage.setItem('token', token);
         localStorage.setItem('role', role);
+        dispatch(loginSuccess({ token, role, user }))
 
         setSnackbar({
           open: true,
@@ -50,7 +53,7 @@ const Login = ({ setLoggedIn }) => {
             navigate('/welcome');
           }
 
-          setTimeout(() => setLoggedIn(true), 100);
+         
         }, 1000);
       } catch (err) {
         setSnackbar({
@@ -102,7 +105,7 @@ const Login = ({ setLoggedIn }) => {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <Alert
-          // onClose={handleSnackbarClose}
+          
           severity={snackbar.severity}
           sx={{ width: '100%' }}
           variant="filled"

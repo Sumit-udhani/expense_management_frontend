@@ -1,16 +1,21 @@
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
-const useLogout = (setLoggedIn) => {
+ import { logout } from '../store/features/auth/authSlice';
+const useLogout = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const logout = () => {
+  const handleLogout = () => {
+  
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    setLoggedIn(false);
+
+    
+    dispatch(logout());
     navigate('/login');
   };
 
-  return logout;
+  return handleLogout;
 };
 
 export default useLogout;

@@ -4,9 +4,9 @@ import useLogout from "../hooks/useLogout";
 import Layout from "./Layout";
 import api from "../api/axiosInterceptor"; // adjust path as needed
 import { useParams } from "react-router-dom";
-const LayoutWrapper = ({ setLoggedIn }) => {
+const LayoutWrapper = () => {
   const location = useLocation();
-  const logout = useLogout(setLoggedIn);
+  const logout = useLogout();
   const isAdmin = location.pathname.startsWith("/admin");
   const role = localStorage.getItem("role");
   const { id } = useParams();

@@ -26,12 +26,17 @@ import StyledBox from "./StyledBox";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { fetchExpenses,deleteExpense } from "../store/features/expenseSlice";
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+
 const MyExpenses = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [expenses, setExpenses] = useState([]);
-  const [error, setError] = useState("");
+  const { items: expenses, loading, error, totalPages } = useSelector((state) => state.expenses);
+
+ 
   const [openModal, setOpenModal] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,46 +44,53 @@ const MyExpenses = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [confirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+  const dispatch = useDispatch()
   const [sortConfig, setSortConfig] = useState({
     key: "title",
     direction: "asc",
   });
   const inputRef = useRef(null);
-  const [loading, setLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
+
+ 
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [createCategoryModalOpen, setCreateCategoryModalOpen] = useState(false);
-
+ 
   const debouncedSearch = useMemo(
     () => debounce((term) => setDebouncedSearchTerm(term), 500),
     []
   );
 
-  const fetchExpense = async (page, search, sortColumn, sortOrder) => {
-    setLoading(true);
-    try {
-      const res = await api.get(
-        `/expense?page=${page}&search=${search}&sortColumn=${sortColumn}&sortOrder=${sortOrder}`
-      );
-      setExpenses(res.data.data);
-      setTotalPages(res.data.totalPages);
-      setError("");
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load expenses");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchExpense = async (page, search, sortColumn, sortOrder) => {
+  //   setLoading(true);
+  //   try {
+  //     const res = await api.get(
+  //       `/expense?page=${page}&search=${search}&sortColumn=${sortColumn}&sortOrder=${sortOrder}`
+  //     );
+  //     setExpenses(res.data.data);
+  //     setTotalPages(res.data.totalPages);
+  //     setError("");
+  //   } catch (err) {
+  //     console.error(err);
+  //     setError("Failed to load expenses");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
-    fetchExpense(
-      currentPage,
-      debouncedSearchTerm,
-      sortConfig.key,
-      sortConfig.direction
-    );
-  }, [currentPage, debouncedSearchTerm, sortConfig]);
+    dispatch(fetchExpenses({
+      page: currentPage,
+    search: debouncedSearchTerm,
+    sortColumn: sortConfig.key,
+    sortOrder: sortConfig.direction
+    }))
+    // fetchExpense(
+    //   currentPage,
+    //   debouncedSearchTerm,
+    //   sortConfig.key,
+    //   sortConfig.direction
+    // );
+  }, [dispatch,currentPage, debouncedSearchTerm, sortConfig]);
 
   useEffect(() => () => debouncedSearch.cancel(), []);
   useEffect(() => {
@@ -104,22 +116,22 @@ const MyExpenses = () => {
     setCurrentPage(1);
   };
 
-  const deleteExpense = async () => {
-    setLoading(true);
+  const handleDeleteExpense = async () => {
+    // setLoading(true);
     try {
-      await api.delete(`/expense/${expenseToDelete}`);
-      fetchExpense(
-        currentPage,
-        debouncedSearchTerm,
-        sortConfig.key,
-        sortConfig.direction
-      );
+     dispatch(deleteExpense(expenseToDelete))
+      dispatch(fetchExpenses({
+      page: currentPage,
+      search: debouncedSearchTerm,
+      sortColumn: sortConfig.key,
+      sortOrder: sortConfig.direction
+    }));
       setConfirmDeleteModalOpen(false);
       setExpenseToDelete(null);
     } catch (err) {
       console.error("Error deleting expense:", err);
       setError("Failed to delete expense");
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -280,12 +292,13 @@ const MyExpenses = () => {
           onSuccess={() => {
             setOpenModal(false);
             setSelectedExpense(null);
-            fetchExpense(
-              currentPage,
-              debouncedSearchTerm,
-              sortConfig.key,
-              sortConfig.direction
-            );
+            dispatch(fetchExpenses({
+              page: currentPage,
+              search: debouncedSearchTerm,
+              sortColumn: sortConfig.key,
+              sortOrder: sortConfig.direction
+            }));
+            
           }}
         />
       </ReusableModal>
@@ -314,7 +327,7 @@ const MyExpenses = () => {
             label="Delete"
             color="error"
             variant="outlined"
-            onClick={deleteExpense}
+            onClick={handleDeleteExpense}
             sx={{ px: 2, py: 0.6, fontSize: "0.8rem", mt: 0, ml: 0, mb: 0 }}
           />
         </Box>

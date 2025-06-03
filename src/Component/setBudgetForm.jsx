@@ -5,34 +5,48 @@ import api from '../api/axiosInterceptor';
 import AuthForm from './AuthForm';
 import ReusableModal from './ReusableModal';
 import Loader from './Loader';
+import { fetchCategories } from '../store/features/categorySlice';
+import { useDispatch,useSelector} from 'react-redux';
 
 const SetBudgetForm = ({ open, handleClose, onSuccess, initialData, overallBudgetAmount, categoryName }) => {
-  const [categories, setCategories] = useState([]);
+  const { items: categories, loading: categoryLoading, error: categoryError } = useSelector(
+    (state) => state.categories
+  );
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [categoryLoading, setCategoryLoading] = useState(true);
+  // const [categoryLoading, setCategoryLoading] = useState(true);
   const [msg, setMsg] = useState('');
   const [amount, setAmount] = useState('');
+  const dispatch = useDispatch()
+  // useEffect(() => {
+  //   const fetchCategories = async () => {
+  //     setMsg('Categories Loading');
+  //     try {
+  //       const res = await api.get('/category');
+  //       setCategories(res.data);
+  //     } catch (err) {
+  //       console.error('Error fetching categories:', err);
+  //       setError('Failed to load categories');
+  //     } finally {
+  //       setCategoryLoading(false);
+  //     }
+  //   };
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setMsg('Categories Loading');
+  //   if (open) {
+  //     fetchCategories();
+  //   }
+  // }, [open]);
+  useEffect(()=>{
+    const fetchData = async () => {
       try {
-        const res = await api.get('/category');
-        setCategories(res.data);
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-        setError('Failed to load categories');
-      } finally {
-        setCategoryLoading(false);
+      dispatch(fetchCategories());
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
       }
     };
-
-    if (open) {
-      fetchCategories();
-    }
-  }, [open]);
-
+  
+    fetchData();
+  },[dispatch])
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -129,7 +143,12 @@ const SetBudgetForm = ({ open, handleClose, onSuccess, initialData, overallBudge
       type: 'number',
     },
   ];
-
+  useEffect(()=>{
+    if (!open) {
+      setError('')
+      formik.resetForm()
+    }
+  },[open])
   return (
     <ReusableModal open={open} handleClose={handleClose} title="Set Monthly Budget" maxWidth={350}>
       {categoryLoading ? (

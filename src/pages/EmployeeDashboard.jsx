@@ -36,9 +36,11 @@ function EmployeeDashboard() {
 
   if (loading) return <Loader />
 
-  const totalBudget = budgetStatus?.overallBudget?.amount || 0;
-  const totalSpent = budgetStatus?.totalSpent || 0;
-  const progress = ((totalSpent / totalBudget) * 100).toFixed(0);
+  const totalBudget = parseFloat(budgetStatus?.overallBudget?.amount || 0);
+  const totalSpent = parseFloat(budgetStatus?.overallBudget?.spent || 0);
+  const progress = totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(0) : 0;
+  
+
   const yearOptions = [2023, 2024, 2025].map((y) => ({ label: y, value: y }));
   const monthOptions = Array.from({ length: 12 }, (_, i) => ({
     value: i + 1,

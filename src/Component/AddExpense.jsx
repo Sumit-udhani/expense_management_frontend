@@ -1,34 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch,useSelector } from 'react-redux';
+import { addExpenses, updateExpenses } from '../store/features/expenseSlice'
 import api from '../api/axiosInterceptor';
 import AuthForm from './AuthForm';
-import { CircularProgress } from '@mui/material';
 import Loader from './Loader';
+import { fetchCategories } from '../store/features/categorySlice';
 
 const AddExpenseForm = ({ onSuccess, initialData }) => {
-  const [categories, setCategories] = useState([]);
+  const { items: categories, loading: categoryLoading, error: categoryError } = useSelector(
+    (state) => state.categories
+  );
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [categoryLoading, setCategoryLoading] = useState(true);
-  const [msg,setMsg] = useState('')
+  // const [categoryLoading, setCategoryLoading] = useState(true);
+  const [msg, setMsg] = useState('');
+
+  const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   const fetchCategories = async () => {
+  //     setMsg('Categories loading');
+  //     try {
+  //       const res = await api.get('/category');
+  //       setCategories(res.data);
+  //     } catch (err) {
+  //       console.error('Error fetching categories:', err);
+  //       setError('Failed to load categories');
+  //     } finally {
+  //       setCategoryLoading(false);
+  //     }
+  //   };
+  //   fetchCategories();
+  // }, []);
   useEffect(() => {
-    const fetchCategories = async () => {
-      setMsg('Categories loading'); 
+    const fetchData = async () => {
       try {
-        const res = await api.get('/category');
-        setCategories(res.data);
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-        setError('Failed to load categories');
-      }finally{
-        setCategoryLoading(false)
+      dispatch(fetchCategories());
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
       }
     };
-    fetchCategories();
-  }, []);
-
   
+    fetchData();
+  }, [dispatch]);
+  
+
   const formik = useFormik({
     initialValues: {
       title: initialData?.title || '',
@@ -51,6 +69,7 @@ const AddExpenseForm = ({ onSuccess, initialData }) => {
     onSubmit: async (values, { resetForm }) => {
       setIsLoading(true);
       setError('');
+
       try {
         const formData = new FormData();
         Object.entries(values).forEach(([key, value]) => {
@@ -59,22 +78,18 @@ const AddExpenseForm = ({ onSuccess, initialData }) => {
         });
 
         if (initialData) {
-         
-          await api.put(`/expense/${initialData.id}`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-          });
+        
+          await dispatch(updateExpenses({ id: initialData.id, updates: formData })).unwrap();
         } else {
          
-          await api.post('/expense', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-          });
+          await dispatch(addExpenses(formData)).unwrap();
         }
 
         resetForm();
         onSuccess();
       } catch (err) {
-        setError(initialData ? 'Failed to update expense' : 'Failed to add expense');
         console.error(err);
+        setError(initialData ? 'Failed to update expense' : 'Failed to add expense');
       } finally {
         setIsLoading(false);
       }
@@ -114,28 +129,25 @@ const AddExpenseForm = ({ onSuccess, initialData }) => {
     { name: 'date', type: 'date' },
     { name: 'attachment', type: 'file' },
   ];
-  if (categoryLoading) {
-    return (
-      <Loader/>
-    );
-  }
+
+  if (categoryLoading) return <Loader />;
+
   return (
     <AuthForm
-    formik={formik}
-    fields={fields}
-    buttonLabel={initialData ? 'Save' : 'Add Expense'}
-    isLoading={isLoading}
-    error={error}
-    customLayout={true}
-    fieldSpacingProps={{
-      rowGap: 0,
-      columnGap: 2
-    }}
-    fieldPropsOverride={(field) =>
-      field.type === 'file' ? { context: 'addExpense' } : {}
-    }
-  />
-  
+      formik={formik}
+      fields={fields}
+      buttonLabel={initialData ? 'Save' : 'Add Expense'}
+      isLoading={isLoading}
+      error={error}
+      customLayout={true}
+      fieldSpacingProps={{
+        rowGap: 0,
+        columnGap: 2,
+      }}
+      fieldPropsOverride={(field) =>
+        field.type === 'file' ? { context: 'addExpense' } : {}
+      }
+    />
   );
 };
 
